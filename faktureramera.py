@@ -1,26 +1,30 @@
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 
 import lib.pdflib as pdflib
  
 class FaktureraMera(QWidget):
     def __init__(self, parent=None):
         super(FaktureraMera, self).__init__(parent)
- 
-        nameLabel = QLabel("Name:")
-        self.nameLine = QLineEdit()
-        self.submitButton = QPushButton("&Submit")
- 
-        buttonLayout1 = QVBoxLayout()
-        buttonLayout1.addWidget(nameLabel)
-        buttonLayout1.addWidget(self.nameLine)
-        buttonLayout1.addWidget(self.submitButton)
- 
-        self.submitButton.clicked.connect(self.submitContact)
- 
+        settingsWidget = SettingsWidget(parent=self)
+
+        table = QTableView(self)
+
+        tabPane = QTabWidget(self)
+
+        tabPane.addTab(table, "Fakturera")
+        tabPane.addTab(table, "History")
+        tabPane.addTab(settingsWidget, "Settings")
+        
+        tabLayout = QVBoxLayout()
+        tabLayout.addWidget(tabPane)
+        
+        
         mainLayout = QGridLayout()
 
-        mainLayout.addLayout(buttonLayout1, 0, 1)
+        mainLayout.addLayout(tabLayout, 0, 1)
+        
  
         self.setLayout(mainLayout)
         self.setWindowTitle("Faktureramera")
@@ -29,6 +33,23 @@ class FaktureraMera(QWidget):
         bg = pdflib.BillGenerator()
         bg.generate()
  
+
+
+class SettingsWidget(QWidget):
+    def __init__(self, parent=None):
+        super(SettingsWidget, self).__init__(parent)
+        nameLine = QTextEdit()
+        layout = QVBoxLayout()
+        layout.addWidget(nameLine)
+        self.setLayout(layout)
+        
+
+# class HistoryWidget(QWidget):
+#     pass
+
+# class BillingWidget(QWidget):
+#     pass
+
 if __name__ == '__main__':
     import sys
  
