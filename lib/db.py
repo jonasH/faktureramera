@@ -12,21 +12,12 @@ def openDatabase(databaseName='fmdb.sqlite'):
          QMessageBox.critical(None," OMG ERROR! withz the database: " + databaseName,
                 QMessageBox.Cancel)
          return False
-#    query = QSqlQuery()
-#    for i in open("/home/jonas/Kod/FaktureraMera2/misc/fakturabackup.sqlite"):
- #       query.exec_(i)
- #       print(query.lastError().text())
-    
-#    result = query.exec_('select * from bill')
-#    print(result)
+    query = QSqlQuery()
+    for i in open("/home/jonas/Kod/FaktureraMera2/misc/fakturabackup.sqlite"):
+        query.exec_(i)
+        print(query.lastError().text())
+   
+    result = query.exec_('select * from bill')
+    print(result)
     return True
-
-
-def initializeHistoryModel(model):
-    model.setQuery('select * from bill')
-    model.setHeaderData(0, Qt.Horizontal, "ID")
-    model.setHeaderData(2, Qt.Horizontal, "Namn")
-    model.setHeaderData(3, Qt.Horizontal, "Fakturan skapad")
-    model.setHeaderData(4, Qt.Horizontal, "Betald")
-
 

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'faktureramera.ui'
 #
-# Created: Tue Apr  1 19:39:51 2014
+# Created: Wed Apr  9 20:17:23 2014
 #      by: PyQt5 UI code generator 5.0.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -29,8 +29,20 @@ class Ui_MainWindow(object):
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.tab_2)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.tableView = QtWidgets.QTableView(self.tab_2)
+        self.tableView.setAlternatingRowColors(True)
+        self.tableView.setSortingEnabled(True)
         self.tableView.setObjectName("tableView")
         self.verticalLayout_3.addWidget(self.tableView)
+        self.groupBox = QtWidgets.QGroupBox(self.tab_2)
+        self.groupBox.setObjectName("groupBox")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.groupBox)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem)
+        self.generateButton = QtWidgets.QPushButton(self.groupBox)
+        self.generateButton.setObjectName("generateButton")
+        self.horizontalLayout.addWidget(self.generateButton)
+        self.verticalLayout_3.addWidget(self.groupBox)
         self.tabWidget.addTab(self.tab_2, "")
         self.verticalLayout.addWidget(self.tabWidget)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -43,12 +55,13 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Faktureramera"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Fakturera"))
+        self.generateButton.setText(_translate("MainWindow", "Generera"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Historik"))
 

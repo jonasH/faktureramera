@@ -3,6 +3,11 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
+# TODO: create datastructure to send a bill over
+#class Bill():
+    
+
+
 class BillGenerator():
     """A class that will generate a bill"""
     headingFont  = QFont("Times", 22)
