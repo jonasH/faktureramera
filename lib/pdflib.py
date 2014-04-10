@@ -3,10 +3,40 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-# TODO: create datastructure to send a bill over
-#class Bill():
-    
+## TODO: move this to a "model" module
+# TODO: generate getters/setters
+class Job():
+    price = 0
+    number = 0
+    text = ""
+    def __init__(self, price, number,text ):
+        self.price = price
+        self.number = number
+        self.text = text
 
+class Customer():
+    id
+
+# TODO: generate getters/setters
+class Bill():
+    date = ""
+    idNr = 0
+    ref = ""
+    name = ""
+    address = ""
+    zipCode = ""
+    jobs = []
+
+    def __init__(self, idNr, date, ref, name, address, zipCode):
+         self.date, self.idNr, self.ref, self.name, self.address, self.zipCode = date, idNr, ref, name, address, zipCode
+
+    
+    def addJob(self,job):
+        self.jobs.append(job)
+
+    def removeJob(self, job):
+        self.jobs.remove(job)
+    
 
 class BillGenerator():
     """A class that will generate a bill"""
