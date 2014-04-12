@@ -9,7 +9,10 @@ import lib.db as db
 import lib.pdflib as pdflib
 import lib.fakturamodel as model
 
+from gui.jobForm import JobForm
+from gui.newcustomerform import NewCustomerForm
 
+# TODO: bryt ut denna till en egen klass i gui katalogen
 class FaktureraMeraWindow(QMainWindow):
 
    def __init__(self,  parent=None):
@@ -23,6 +26,11 @@ class FaktureraMeraWindow(QMainWindow):
         self.initializeHistoryModel(historyModel)
         self.ui.tableView.setModel(historyModel)
 
+        self.ui.jobsLayout.addWidget(JobForm())
+        self.ui.jobsLayout.addWidget(JobForm())
+        self.ui.jobsLayout.addWidget(JobForm())
+
+
    @pyqtSlot()
    def on_generateButton_clicked(self):
       idx = self.ui.tableView.selectionModel().currentIndex()
@@ -32,10 +40,18 @@ class FaktureraMeraWindow(QMainWindow):
       model = self.ui.tableView.model()
       idx = model.index(idx.row(), 0)
       billId = int(model.data(idx))
-      self.getBillData(billId)
-      return
-      bill = pdflib.BillGenerator()
-      bill.generate()
+      bill = self.getBillData(billId)
+      pdf = pdflib.BillGenerator(bill)
+      if pdf.fileExsists:
+         print("file exists")
+      else:
+         print("file does NOT exist")
+
+      pdf.generate()
+
+   @pyqtSlot()
+   def on_newCustomerButton_clicked(self):
+      self.ui.newCustomerLayout.addWidget(NewCustomerForm())
 
    def extractBill(self, query):
       query.next()
@@ -84,9 +100,7 @@ class FaktureraMeraWindow(QMainWindow):
       jobs = self.extractJobs(query)
       for j in jobs:
          bill.addJob(j)
-
-      ###TOMORROW: add call to pdf
-      
+      return bill
 
       
          

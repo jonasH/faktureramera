@@ -51,3 +51,16 @@ class Bill():
     def getCustomer(self):
         """"""
         return self.customer
+
+# TODO: all settings here! Shortcut: hardcode
+class Profile():
+    def __init__(self):
+        """"""
+        self.daysToPay = 30
+        self.address = "Överhärdevägen 57 \n 818 91 Valbo"
+        self.mail = "leif.hesselryd@telia.se"
+        self.telephone = "070 671 24 37"
+        self.orgNr = "ABC123"
+        self.bankAccount = "ABC123"
+        self.tax = 0.25
+        self.billLocation = "fakturor/"

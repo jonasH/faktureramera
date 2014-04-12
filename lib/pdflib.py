@@ -1,62 +1,43 @@
-import sys
+import sys,os
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-
-## TODO: move this to a "model" module
-# TODO: generate getters/setters
-class Job():
-    price = 0
-    number = 0
-    text = ""
-    def __init__(self, price, number,text ):
-        self.price = price
-        self.number = number
-        self.text = text
-
-class Customer():
-    id
-
-# TODO: generate getters/setters
-class Bill():
-    date = ""
-    idNr = 0
-    ref = ""
-    name = ""
-    address = ""
-    zipCode = ""
-    jobs = []
-
-    def __init__(self, idNr, date, ref, name, address, zipCode):
-         self.date, self.idNr, self.ref, self.name, self.address, self.zipCode = date, idNr, ref, name, address, zipCode
-
+try:
+    import fakturamodel
+except Exception:
+    import lib.fakturamodel as fakturamodel
     
-    def addJob(self,job):
-        self.jobs.append(job)
-
-    def removeJob(self, job):
-        self.jobs.remove(job)
-    
-
+# TODO: variablealize bunch of selfies
 class BillGenerator():
     """A class that will generate a bill"""
     headingFont  = QFont("Times", 22)
     normalFont = QFont("Times", 12)
     fineFont = QFont("Times", 8)
-    doc = QPdfWriter("test.pdf")
+    
     painter = QPainter()
     normalRowDistance = 250
+    
 
-    #def __init__(self):
+    def __init__(self, bill):
+        self.bill = bill
+        self.profile = fakturamodel.Profile()
+        if not os.path.exists(self.profile.billLocation):
+            os.mkdir(self.profile.billLocation)
+        fileName =  self.profile.billLocation + str(bill.id) + "-" +bill.customer.name +".pdf"
+        self.doc = QPdfWriter(fileName)
+        self.fileExsists = os.path.exists(fileName)
 
+        self.margin = self.doc.width() / 10
         
     
     def generate(self):
         """Print a new bill"""
+        # TODO: check if file exists!
         self.painter.begin(self.doc)
         self.printHeading()
         self.printInformation()
         self.printSpecificationTemplate()
+        self.printSpecification()
         self.painter.end()
 
     def printHeading(self):
@@ -69,28 +50,32 @@ class BillGenerator():
         xFirst = self.doc.width() / 10
         yFirst = self.doc.height() / 10
         xSecond = self.doc.width() / 2 + self.doc.width() / 10
+        y,m,d = self.bill.bill_date.split('-')
+        date = QDate(int(y),int(m),int(d))
+        dateFormat = 'yyyy-MM-dd'
+        ##  TODO: make this number changable in the profile
+        payDay = date.addDays(self.profile.daysToPay)
         
         self.painter.setFont(self.normalFont)
         
         # first column
-        self.painter.drawText(xFirst, yFirst, "Datum: ")
-        self.painter.drawText(xFirst, yFirst + self.normalRowDistance, "Fakturanummer: ")
-        self.painter.drawText(xFirst, yFirst + self.normalRowDistance * 2, "Förfallodag: ")
-        self.painter.drawText(xFirst, yFirst + self.normalRowDistance * 3, "Er Referens: ")
+        self.painter.drawText(xFirst, yFirst, "Datum: " + date.toString(dateFormat))
+        self.painter.drawText(xFirst, yFirst + self.normalRowDistance, "Fakturanummer: " + str(self.bill.id))
+        self.painter.drawText(xFirst, yFirst + self.normalRowDistance * 2, "Förfallodag: " + payDay.toString(dateFormat))
+        self.painter.drawText(xFirst, yFirst + self.normalRowDistance * 3, "Er Referens: " + self.bill.reference)
 
 
         # second column
         # TODO: take care of long names
-        self.painter.drawText(xSecond, yFirst, "?? mottagare ??")
-        self.painter.drawText(xSecond, yFirst + self.normalRowDistance, "??adress??")
-        self.painter.drawText(xSecond, yFirst + self.normalRowDistance * 2, "??postnr + ort?? ")
+        self.painter.drawText(xSecond, yFirst, self.bill.customer.name)
+        self.painter.drawText(xSecond, yFirst + self.normalRowDistance, self.bill.customer.address)
+        self.painter.drawText(xSecond, yFirst + self.normalRowDistance * 2, self.bill.customer.zipcode)
         
         
     def printSpecificationTemplate(self):
         """Draw the specification of the bill"""
-        # TODO: move this to a membervar(xFirst)
         # TODO: maybe shorten this function?
-        margin = self.doc.width() / 10
+        # TODO: globlaize column sync with below
         yFirstLine = self.doc.height() / 3
         yThirdLine = (self.doc.height() / 4) * 3
         pen = QPen()
@@ -98,29 +83,63 @@ class BillGenerator():
 
         # draw lines
         self.painter.setPen(pen)
-        self.painter.drawLine(margin, yFirstLine , self.doc.width() - margin, yFirstLine)
-        self.painter.drawLine(margin, yFirstLine + self.normalRowDistance * 2 , self.doc.width() - margin, yFirstLine + self.normalRowDistance * 2 )
-        self.painter.drawLine(margin, yThirdLine , self.doc.width() - margin, yThirdLine )
-        self.painter.drawLine(self.doc.width() - margin * 3, yThirdLine + self.normalRowDistance * 3 , self.doc.width() - margin, yThirdLine + self.normalRowDistance * 3)
-        self.painter.drawLine(margin, yThirdLine + self.normalRowDistance * 5 , self.doc.width() - margin, yThirdLine + self.normalRowDistance * 5)
+        self.painter.drawLine(self.margin, yFirstLine , self.doc.width() - self.margin, yFirstLine)
+        self.painter.drawLine(self.margin, yFirstLine + self.normalRowDistance * 2 ,
+                              self.doc.width() - self.margin, yFirstLine + self.normalRowDistance * 2 )
+        self.painter.drawLine(self.margin, yThirdLine , self.doc.width() - self.margin, yThirdLine )
+        self.painter.drawLine(self.doc.width() - self.margin * 3, yThirdLine + self.normalRowDistance * 3 ,
+                              self.doc.width() - self.margin, yThirdLine + self.normalRowDistance * 3)
+        self.painter.drawLine(self.margin, yThirdLine + self.normalRowDistance * 5 ,
+                              self.doc.width() - self.margin, yThirdLine + self.normalRowDistance * 5)
         # text section
         self.painter.setFont(self.normalFont)
-        self.painter.drawText(margin, yFirstLine + self.normalRowDistance , " Specification")
-        self.painter.drawText(margin * 6, yFirstLine + self.normalRowDistance , " Antal")
-        self.painter.drawText(margin * 7, yFirstLine + self.normalRowDistance , " a kronor")
-        self.painter.drawText(margin * 8, yFirstLine + self.normalRowDistance , " Totalt")
+        self.painter.drawText(self.margin, yFirstLine + self.normalRowDistance , " Specification")
+        self.painter.drawText(self.margin * 6, yFirstLine + self.normalRowDistance , " Antal")
+        self.painter.drawText(self.margin * 7, yFirstLine + self.normalRowDistance , " a kronor")
+        self.painter.drawText(self.margin * 8, yFirstLine + self.normalRowDistance , " Totalt")
         
-        self.painter.drawText(margin * 8, yThirdLine +self.normalRowDistance , "Summa: ")
-        self.painter.drawText(margin * 8, yThirdLine +self.normalRowDistance*2 , "Moms: ")
-        self.painter.drawText(margin * 8, yThirdLine +self.normalRowDistance*4 , "Totalt: ")
+        self.painter.drawText(self.margin * 7, yThirdLine +self.normalRowDistance , "Summa: ")
+        self.painter.drawText(self.margin * 7, yThirdLine +self.normalRowDistance*2 , "Moms: ")
+        self.painter.drawText(self.margin * 7, yThirdLine +self.normalRowDistance*4 , "Totalt: ")
 
         self.painter.setFont(self.fineFont)
-        self.painter.drawText(margin, yThirdLine +self.normalRowDistance*6 , "Adress: ")
-        self.painter.drawText(margin*4, yThirdLine +self.normalRowDistance*6 , "Telefon: ")
-        self.painter.drawText(margin*6, yThirdLine +self.normalRowDistance*6 , "Mail: ")
-        self.painter.drawText(margin*8, yThirdLine +self.normalRowDistance*6 , "Momsreg.nr/org.nr: ")
-        self.painter.drawText(margin*8, yThirdLine +self.normalRowDistance*7 , "Bankgiro ")
-        self.painter.drawText(margin*8, yThirdLine +self.normalRowDistance*8 , "Företaget innehar F-skattebevis ")
+        self.painter.drawText(self.margin, yThirdLine +self.normalRowDistance*6 ,
+                              "Adress: " + self.profile.address)
+        self.painter.drawText(self.margin*4, yThirdLine +self.normalRowDistance*6 ,
+                              "Telefon: " + self.profile.telephone)
+        self.painter.drawText(self.margin*6, yThirdLine +self.normalRowDistance*6 ,
+                              "Mail: " + self.profile.mail)
+        self.painter.drawText(self.margin*8, yThirdLine +self.normalRowDistance*6 ,
+                              "Momsreg.nr/org.nr: " + self.profile.orgNr)
+        self.painter.drawText(self.margin*8, yThirdLine +self.normalRowDistance*7 ,
+                              "Bankgiro " + self.profile.bankAccount)
+        self.painter.drawText(self.margin*8, yThirdLine +self.normalRowDistance*8 ,
+                              "Företaget innehar F-skattebevis ")
 
         
+    def printSpecification(self):
+        """"""
+        # TODO:  globlaize column sync with above
+        yFirstLine = self.doc.height() / 3 + (self.normalRowDistance * 3)
+        yThirdLine = (self.doc.height() / 4) * 3
+        secondCol = self.margin * 6
+        thirdCol = self.margin * 7
+        fourthCol = self.margin * 8
+        self.painter.setFont(self.normalFont)
 
+        i = 0
+        totalSum = 0
+        for job in self.bill.jobs:
+            yLine = yFirstLine + self.normalRowDistance * i
+            self.painter.drawText(self.margin,yLine, job.text)
+            self.painter.drawText(secondCol,yLine,  str(job.number))
+            self.painter.drawText(thirdCol, yLine, str(job.price))
+            self.painter.drawText(fourthCol, yLine, str(job.price * job.number))
+            totalSum += job.price * job.number
+            i += 1
+        
+
+        self.painter.drawText(fourthCol, yThirdLine +self.normalRowDistance ,  str(totalSum))
+        tax = int(totalSum * self.profile.tax)
+        self.painter.drawText(fourthCol, yThirdLine +self.normalRowDistance*2 ,  str(tax))
+        self.painter.drawText(fourthCol, yThirdLine +self.normalRowDistance*4 ,  str(totalSum + tax))
