@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui/jobform.ui'
 #
-# Created: Sat Apr 12 19:19:00 2014
+# Created: Sun Apr 13 21:18:25 2014
 #      by: PyQt5 UI code generator 5.0.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -23,24 +23,24 @@ class Ui_jobForm(object):
         self.label = QtWidgets.QLabel(self.inputBox)
         self.label.setObjectName("label")
         self.horizontalLayout_2.addWidget(self.label)
-        self.lineEdit = QtWidgets.QLineEdit(self.inputBox)
-        self.lineEdit.setObjectName("lineEdit")
-        self.horizontalLayout_2.addWidget(self.lineEdit)
+        self.description = QtWidgets.QLineEdit(self.inputBox)
+        self.description.setObjectName("description")
+        self.horizontalLayout_2.addWidget(self.description)
         self.label_2 = QtWidgets.QLabel(self.inputBox)
         self.label_2.setObjectName("label_2")
         self.horizontalLayout_2.addWidget(self.label_2)
-        self.lineEdit_2 = QtWidgets.QLineEdit(self.inputBox)
-        self.lineEdit_2.setMaximumSize(QtCore.QSize(75, 16777215))
-        self.lineEdit_2.setObjectName("lineEdit_2")
-        self.horizontalLayout_2.addWidget(self.lineEdit_2)
+        self.price = QtWidgets.QLineEdit(self.inputBox)
+        self.price.setMaximumSize(QtCore.QSize(75, 16777215))
+        self.price.setObjectName("price")
+        self.horizontalLayout_2.addWidget(self.price)
         self.label_3 = QtWidgets.QLabel(self.inputBox)
         self.label_3.setObjectName("label_3")
         self.horizontalLayout_2.addWidget(self.label_3)
-        self.lineEdit_3 = QtWidgets.QLineEdit(self.inputBox)
-        self.lineEdit_3.setMinimumSize(QtCore.QSize(75, 0))
-        self.lineEdit_3.setMaximumSize(QtCore.QSize(75, 16777215))
-        self.lineEdit_3.setObjectName("lineEdit_3")
-        self.horizontalLayout_2.addWidget(self.lineEdit_3)
+        self.number = QtWidgets.QLineEdit(self.inputBox)
+        self.number.setMinimumSize(QtCore.QSize(75, 0))
+        self.number.setMaximumSize(QtCore.QSize(75, 16777215))
+        self.number.setObjectName("number")
+        self.horizontalLayout_2.addWidget(self.number)
         self.verticalLayout.addWidget(self.inputBox)
 
         self.retranslateUi(jobForm)

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'faktureramera.ui'
 #
-# Created: Sat Apr 12 19:19:00 2014
+# Created: Sun Apr 13 21:18:25 2014
 #      by: PyQt5 UI code generator 5.0.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -35,10 +35,10 @@ class Ui_MainWindow(object):
         self.label.setMaximumSize(QtCore.QSize(200, 16777215))
         self.label.setObjectName("label")
         self.verticalLayout_4.addWidget(self.label)
-        self.comboBox = QtWidgets.QComboBox(self.customerGroup)
-        self.comboBox.setMinimumSize(QtCore.QSize(300, 0))
-        self.comboBox.setObjectName("comboBox")
-        self.verticalLayout_4.addWidget(self.comboBox)
+        self.customerChooser = QtWidgets.QComboBox(self.customerGroup)
+        self.customerChooser.setMinimumSize(QtCore.QSize(300, 0))
+        self.customerChooser.setObjectName("customerChooser")
+        self.verticalLayout_4.addWidget(self.customerChooser)
         self.newCustomerButton = QtWidgets.QPushButton(self.customerGroup)
         self.newCustomerButton.setMaximumSize(QtCore.QSize(100, 16777215))
         self.newCustomerButton.setObjectName("newCustomerButton")
@@ -62,9 +62,16 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.jobsGroup)
         self.groupBox_3 = QtWidgets.QGroupBox(self.tab)
         self.groupBox_3.setMaximumSize(QtCore.QSize(16777215, 75))
+        self.groupBox_3.setTitle("")
         self.groupBox_3.setObjectName("groupBox_3")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.groupBox_3)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.addJobButton = QtWidgets.QPushButton(self.groupBox_3)
+        self.addJobButton.setObjectName("addJobButton")
+        self.horizontalLayout_2.addWidget(self.addJobButton)
+        self.removeJobButton = QtWidgets.QPushButton(self.groupBox_3)
+        self.removeJobButton.setObjectName("removeJobButton")
+        self.horizontalLayout_2.addWidget(self.removeJobButton)
         spacerItem2 = QtWidgets.QSpacerItem(640, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem2)
         self.saveGenerateButton = QtWidgets.QPushButton(self.groupBox_3)
@@ -113,7 +120,8 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "Kund:"))
         self.newCustomerButton.setText(_translate("MainWindow", "Ny"))
         self.jobsGroup.setTitle(_translate("MainWindow", "Jobb"))
-        self.groupBox_3.setTitle(_translate("MainWindow", "GroupBox"))
+        self.addJobButton.setText(_translate("MainWindow", "Nytt jobb"))
+        self.removeJobButton.setText(_translate("MainWindow", "Ta bort jobb"))
         self.saveGenerateButton.setText(_translate("MainWindow", "Generera"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Fakturera"))
         self.generateButton.setText(_translate("MainWindow", "Generera"))

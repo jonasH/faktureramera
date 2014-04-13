@@ -23,6 +23,7 @@ class BillGenerator():
         self.profile = fakturamodel.Profile()
         if not os.path.exists(self.profile.billLocation):
             os.mkdir(self.profile.billLocation)
+        print(bill.id)
         fileName =  self.profile.billLocation + str(bill.id) + "-" +bill.customer.name +".pdf"
         self.doc = QPdfWriter(fileName)
         self.fileExsists = os.path.exists(fileName)
