@@ -7,6 +7,10 @@ try:
 except Exception:
     import lib.fakturamodel as fakturamodel
     
+
+
+from math import floor, ceil
+
 # TODO: variablealize bunch of selfies
 class BillGenerator():
     """A class that will generate a bill"""
@@ -24,9 +28,9 @@ class BillGenerator():
         if not os.path.exists(self.profile.billLocation):
             os.mkdir(self.profile.billLocation)
         print(bill.id)
-        fileName =  self.profile.billLocation + str(bill.id) + "-" +bill.customer.name +".pdf"
-        self.doc = QPdfWriter(fileName)
-        self.fileExsists = os.path.exists(fileName)
+        self.fileName =  self.profile.billLocation + str(bill.id) + "-" +bill.customer.name +".pdf"
+        self.doc = QPdfWriter(self.fileName)
+        self.fileExsists = os.path.exists(self.fileName)
 
         self.margin = self.doc.width() / 10
         
@@ -40,6 +44,7 @@ class BillGenerator():
         self.printSpecificationTemplate()
         self.printSpecification()
         self.painter.end()
+        return self.fileName
 
     def printHeading(self):
         """Helper function for printing the header of the bill"""
@@ -67,10 +72,17 @@ class BillGenerator():
 
 
         # second column
-        # TODO: take care of long names
-        self.painter.drawText(xSecond, yFirst, self.bill.customer.name)
-        self.painter.drawText(xSecond, yFirst + self.normalRowDistance, self.bill.customer.address)
-        self.painter.drawText(xSecond, yFirst + self.normalRowDistance * 2, self.bill.customer.zipcode)
+
+        if len(self.bill.customer.name) > 25:
+            split = self.bill.customer.name.rsplit(' ')
+            self.painter.drawText(xSecond, yFirst, " ".join(split[0:floor(len(split)/2)]))
+            self.painter.drawText(xSecond, yFirst + self.normalRowDistance, " ".join(split[ceil(len(split)/2):]))
+            self.painter.drawText(xSecond, yFirst + self.normalRowDistance * 2, self.bill.customer.address)
+            self.painter.drawText(xSecond, yFirst + self.normalRowDistance * 3, self.bill.customer.zipcode)
+        else:    
+            self.painter.drawText(xSecond, yFirst, self.bill.customer.name)
+            self.painter.drawText(xSecond, yFirst + self.normalRowDistance, self.bill.customer.address)
+            self.painter.drawText(xSecond, yFirst + self.normalRowDistance * 2, self.bill.customer.zipcode)
         
         
     def printSpecificationTemplate(self):

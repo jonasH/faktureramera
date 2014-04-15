@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'faktureramera.ui'
 #
-# Created: Sun Apr 13 21:18:25 2014
+# Created: Tue Apr 15 17:42:44 2014
 #      by: PyQt5 UI code generator 5.0.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -45,6 +45,18 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.addWidget(self.newCustomerButton)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_4.addItem(spacerItem)
+        self.groupBox_2 = QtWidgets.QGroupBox(self.customerGroup)
+        self.groupBox_2.setTitle("")
+        self.groupBox_2.setObjectName("groupBox_2")
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout(self.groupBox_2)
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        self.label_2 = QtWidgets.QLabel(self.groupBox_2)
+        self.label_2.setObjectName("label_2")
+        self.horizontalLayout_5.addWidget(self.label_2)
+        self.referenceField = QtWidgets.QLineEdit(self.groupBox_2)
+        self.referenceField.setObjectName("referenceField")
+        self.horizontalLayout_5.addWidget(self.referenceField)
+        self.verticalLayout_4.addWidget(self.groupBox_2)
         self.horizontalLayout_4.addLayout(self.verticalLayout_4)
         self.newCustomerLayout = QtWidgets.QVBoxLayout()
         self.newCustomerLayout.setObjectName("newCustomerLayout")
@@ -119,6 +131,7 @@ class Ui_MainWindow(object):
         self.customerGroup.setTitle(_translate("MainWindow", "Kund"))
         self.label.setText(_translate("MainWindow", "Kund:"))
         self.newCustomerButton.setText(_translate("MainWindow", "Ny"))
+        self.label_2.setText(_translate("MainWindow", "Referens:"))
         self.jobsGroup.setTitle(_translate("MainWindow", "Jobb"))
         self.addJobButton.setText(_translate("MainWindow", "Nytt jobb"))
         self.removeJobButton.setText(_translate("MainWindow", "Ta bort jobb"))

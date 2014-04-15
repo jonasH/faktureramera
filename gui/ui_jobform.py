@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui/jobform.ui'
 #
-# Created: Sun Apr 13 21:18:25 2014
+# Created: Tue Apr 15 17:42:44 2014
 #      by: PyQt5 UI code generator 5.0.1
 #
 # WARNING! All changes made in this file will be lost!

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow
+from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow,QErrorMessage
 from PyQt5.QtSql import QSqlQueryModel, QSqlQuery
 from PyQt5.QtCore import pyqtSlot, Qt, QDate
 from ui_faktureramera import Ui_MainWindow
@@ -12,6 +12,9 @@ import lib.fakturamodel as model
 from gui.jobForm import JobForm
 from gui.newcustomerform import NewCustomerForm
 
+import os
+
+
 # TODO: bryt ut denna till en egen klass i gui katalogen
 class FaktureraMeraWindow(QMainWindow):
 
@@ -20,7 +23,7 @@ class FaktureraMeraWindow(QMainWindow):
         super(FaktureraMeraWindow, self).__init__(parent)
 
         self.ui = Ui_MainWindow()
-        self.newCustomer = False
+        self.newCustomerActivated = False
         self.ui.setupUi(self)
         historyModel = QSqlQueryModel()
         self.initializeHistoryModel(historyModel)
@@ -29,35 +32,111 @@ class FaktureraMeraWindow(QMainWindow):
         self.jobList = [job]
         self.ui.jobsLayout.addWidget(job)
         self.populateCustomers()
+        self.newCustomerForm = NewCustomerForm()
+        self.newCustomerForm.hide()
+        self.ui.newCustomerLayout.addWidget(self.newCustomerForm)
 
    def populateCustomers(self):
       query = QSqlQuery()
-
+      self.ui.customerChooser.clear()
       query.exec_('select id, name,address, zipcode from customer')
       while query.next():
          c = self.extractCustomer(query)
          self.ui.customerChooser.addItem(c.name)
          
+#TODO: move to db
+   def newBill(self, reference, cId):
+      """"""
+      dateFormat = 'yyyy-MM-dd'
+      date = QDate.currentDate()
+      query = QSqlQuery()
+      sql = "insert into bill values((select max(id) from bill) + 1,'{0}','{1}','{2}',0,NULL)".format(cId, reference,date.toString(dateFormat))
+      query.exec_(sql)
+      query.exec_('select id, c_id, reference, bill_date from bill order by id desc limit 1')
+      query.next()
+      return self.extractBill(query)
 
+   def newCustomer(self,name, address, zip):
+      query = QSqlQuery()
+      sql = "insert into customer values((select max(id) from customer) + 1,'{0}','{1}','{2}')".format(name,address, zip)
+      query.exec_(sql)
+      query.exec_('select id, name,address, zipcode from customer order by id desc limit 1')
+      query.next()
+      return self.extractCustomer(query)
+
+
+   def newJob(self,price,number, text,bId):
+      query = QSqlQuery()
+      sql = "insert into jobs values((select max(id) from jobs) + 1,'{0}','{1}','{2}','{3}')".format(bId,number,price ,text)
+      query.exec_(sql)
+      query.exec_('select hours, price,job,id from jobs order by id desc limit 1')
+      return self.extractJobs(query)[0]
+
+# kanske en nivå för varningar?
+   def validateForSubmit(self):
+      errorMsgs = []
+      reference = self.ui.referenceField.text()
+      if reference == "":
+         errorMsgs.append("Du har glömt referensfältet")
+      counter = 1
+      for j in self.jobList:
+
+         if j.ui.description.text() == "":
+            errorMsgs.append("Du har glömt beskrivning på job " + str(counter))
+         try:
+            int( j.ui.price.text())
+         except Exception:
+            errorMsgs.append("Det ser inte ut som en siffra på priset på job " + str(counter))
+         try:
+            int( j.ui.number.text())
+         except Exception:
+            errorMsgs.append("Det ser inte ut som en siffra på antalet på job " + str(counter))
+         counter += 1
+      #TODO: if new customer is added
+      if self.newCustomerActivated:
+         if self.newCustomerForm.ui.name.text() == "":
+            errorMsgs.append("Det finns inget namn på den nya kunden")
+         if self.newCustomerForm.ui.address.text() == "":
+            errorMsgs.append("Det finns ingen address på den nya kunden")
+         if self.newCustomerForm.ui.zip.text() == "":
+            errorMsgs.append("Det finns inget postnummer på den nya kunden")
+
+      if len(errorMsgs) != 0:
+         errWidget = QErrorMessage(self)
+         errWidget.showMessage("<br/>".join(errorMsgs))
+         return False
+      return True
+         
+            
+            
 
    @pyqtSlot()
    def on_saveGenerateButton_clicked(self):
+      if not self.validateForSubmit():
+         return
       query = QSqlQuery()
       dateFormat = 'yyyy-MM-dd'
       date = QDate.currentDate()
-      customerId = self.ui.customerChooser.currentIndex() + 1
-      query.exec_('select id, name,address, zipcode from customer where id=' + str(customerId))
-      query.next()
-      customer = self.extractCustomer(query)
-      ## TODO: lägg till ett fält med referens
-      bill = model.Bill(1, "ApAN ola", date.toString(dateFormat))
-      print (bill.id)
+      customer = None
+      if self.newCustomerActivated:
+         name = self.newCustomerForm.ui.name.text()
+         address = self.newCustomerForm.ui.address.text()
+         zip = self.newCustomerForm.ui.zip.text()
+         customer = self.newCustomer(name, address, zip)
+      else:
+         customerId = self.ui.customerChooser.currentIndex() + 1
+         query.exec_('select id, name,address, zipcode from customer where id=' + str(customerId))
+         query.next()
+         customer = self.extractCustomer(query)
+
+      customerId = customer.id
+      bill = self.newBill(self.ui.referenceField.text(),customerId)
       bill.setCustomer(customer)
       for j in self.jobList:
          text = j.ui.description.text()
          price = int( j.ui.price.text())
          number = int( j.ui.number.text())
-         job = model.Job(price,number, text)
+         job = self.newJob(price,number, text, bill.id)
          bill.addJob(job)
 
       #kodduplikat, lägg ut i fun
@@ -67,7 +146,10 @@ class FaktureraMeraWindow(QMainWindow):
       else:
          print("file does NOT exist")
 
-      pdf.generate()
+      fileName = pdf.generate()
+
+      
+
       
       
    
@@ -108,14 +190,13 @@ class FaktureraMeraWindow(QMainWindow):
    @pyqtSlot()
    def on_newCustomerButton_clicked(self):
 ##TODO: det ska gå att ta bort newcustmerform
-      if self.newCustomer == True:
-         self.ui.newCustomerLayout.removeWidget(self.newCustomerForm)
-         self.newCustomer = False
+      if self.newCustomerActivated == True:
+         self.newCustomerActivated = False
+         self.newCustomerForm.hide()
          self.ui.newCustomerButton.setText("Ny")
       else:
-         self.newCustomerForm = NewCustomerForm()
-         self.ui.newCustomerLayout.addWidget(self.newCustomerForm)
-         self.newCustomer = True
+         self.newCustomerActivated = True
+         self.newCustomerForm.show()
          self.ui.newCustomerButton.setText("Ångra")
 
    def extractBill(self, query):

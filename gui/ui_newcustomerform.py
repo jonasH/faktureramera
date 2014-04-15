@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui/newcustomerform.ui'
 #
-# Created: Sun Apr 13 21:18:25 2014
+# Created: Tue Apr 15 17:42:44 2014
 #      by: PyQt5 UI code generator 5.0.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -31,15 +31,15 @@ class Ui_NewCustomerForm(object):
         self.horizontalLayout.addLayout(self.verticalLayout)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.lineEdit = QtWidgets.QLineEdit(NewCustomerForm)
-        self.lineEdit.setObjectName("lineEdit")
-        self.verticalLayout_2.addWidget(self.lineEdit)
-        self.lineEdit_2 = QtWidgets.QLineEdit(NewCustomerForm)
-        self.lineEdit_2.setObjectName("lineEdit_2")
-        self.verticalLayout_2.addWidget(self.lineEdit_2)
-        self.lineEdit_3 = QtWidgets.QLineEdit(NewCustomerForm)
-        self.lineEdit_3.setObjectName("lineEdit_3")
-        self.verticalLayout_2.addWidget(self.lineEdit_3)
+        self.name = QtWidgets.QLineEdit(NewCustomerForm)
+        self.name.setObjectName("name")
+        self.verticalLayout_2.addWidget(self.name)
+        self.address = QtWidgets.QLineEdit(NewCustomerForm)
+        self.address.setObjectName("address")
+        self.verticalLayout_2.addWidget(self.address)
+        self.zip = QtWidgets.QLineEdit(NewCustomerForm)
+        self.zip.setObjectName("zip")
+        self.verticalLayout_2.addWidget(self.zip)
         self.horizontalLayout.addLayout(self.verticalLayout_2)
 
         self.retranslateUi(NewCustomerForm)
