@@ -9,7 +9,7 @@ import os
 def openDatabase(databaseName='fmdb.sqlite'):
     db = QSqlDatabase.addDatabase('QSQLITE') 
     #TODO: make this a variable in the profile
-    dbPath = os.getcwd() + 'fm.sqlite'
+    dbPath = os.getcwd() + '/fm.sqlite'
     
 
     db.setDatabaseName(dbPath)
@@ -18,10 +18,10 @@ def openDatabase(databaseName='fmdb.sqlite'):
                 QMessageBox.Cancel)
          return False
     query = QSqlQuery()
-    if not os.path.exists(dbPath):
-        for i in open("/home/jonas/Kod/FaktureraMera2/misc/fakturabackup.sqlite"):
-            query.exec_(i)
-            print(query.lastError().text())
+ #   if not os.path.exists(dbPath):
+    for i in open("/home/jonas/Kod/FaktureraMera2/misc/fakturabackup.sqlite"):
+        query.exec_(i)
+        print(query.lastError().text())
    
     result = query.exec_('select * from bill')
     print(result)

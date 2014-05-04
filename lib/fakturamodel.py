@@ -56,11 +56,13 @@ class Bill():
 class Profile():
     def __init__(self):
         """"""
-        self.daysToPay = 30
-        self.address = "Överhärdevägen 57 \n 818 91 Valbo"
-        self.mail = "leif.hesselryd@telia.se"
-        self.telephone = "070 671 24 37"
-        self.orgNr = "ABC123"
-        self.bankAccount = "ABC123"
-        self.tax = 0.25
-        self.billLocation = "fakturor/"
+        # TODO fix this hack, it's just a quick hack right now
+        import lib.profile as profile
+        self.daysToPay    = profile.daysToPay    
+        self.address      = profile.address      
+        self.mail         = profile.mail         
+        self.telephone    = profile.telephone    
+        self.orgNr        = profile.orgNr        
+        self.bankAccount  = profile.bankAccount  
+        self.tax          = profile.tax          
+        self.billLocation = profile.billLocation 

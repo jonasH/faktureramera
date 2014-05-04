@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'faktureramera.ui'
 #
-# Created: Tue Apr 15 17:42:44 2014
+# Created: Sun May  4 21:32:33 2014
 #      by: PyQt5 UI code generator 5.0.1
 #
 # WARNING! All changes made in this file will be lost!

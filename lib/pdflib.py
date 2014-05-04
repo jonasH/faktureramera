@@ -146,13 +146,13 @@ class BillGenerator():
             yLine = yFirstLine + self.normalRowDistance * i
             self.painter.drawText(self.margin,yLine, job.text)
             self.painter.drawText(secondCol,yLine,  str(job.number))
-            self.painter.drawText(thirdCol, yLine, str(job.price))
-            self.painter.drawText(fourthCol, yLine, str(job.price * job.number))
+            self.painter.drawText(thirdCol, yLine, "{:10.2f}".format(job.price))
+            self.painter.drawText(fourthCol, yLine, "{:10.2f}".format(job.price * job.number))
             totalSum += job.price * job.number
             i += 1
         
 
-        self.painter.drawText(fourthCol, yThirdLine +self.normalRowDistance ,  str(totalSum))
-        tax = int(totalSum * self.profile.tax)
-        self.painter.drawText(fourthCol, yThirdLine +self.normalRowDistance*2 ,  str(tax))
-        self.painter.drawText(fourthCol, yThirdLine +self.normalRowDistance*4 ,  str(totalSum + tax))
+        self.painter.drawText(fourthCol, yThirdLine +self.normalRowDistance ,  "{:10.2f}".format(totalSum))
+        tax = totalSum * self.profile.tax
+        self.painter.drawText(fourthCol, yThirdLine +self.normalRowDistance*2 ,  "{:10.2f}".format(tax))
+        self.painter.drawText(fourthCol, yThirdLine +self.normalRowDistance*4 ,  "{:10.2f}".format(totalSum + tax))
