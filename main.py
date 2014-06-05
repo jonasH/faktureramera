@@ -13,8 +13,8 @@ from gui.jobForm import JobForm
 from gui.newcustomerform import NewCustomerForm
 
 import os
-
-
+import webbrowser
+    
 # TODO: bryt ut denna till en egen klass i gui katalogen
 class FaktureraMeraWindow(QMainWindow):
 
@@ -147,7 +147,7 @@ class FaktureraMeraWindow(QMainWindow):
          print("file does NOT exist")
 
       fileName = pdf.generate()
-
+      webbrowser.open(fileName) 
       
 
       
@@ -185,7 +185,10 @@ class FaktureraMeraWindow(QMainWindow):
       else:
          print("file does NOT exist")
 
-      pdf.generate()
+      fileName = pdf.generate()
+      webbrowser.open(fileName) 
+      
+
 
    @pyqtSlot()
    def on_newCustomerButton_clicked(self):
