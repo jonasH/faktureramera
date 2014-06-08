@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow,QErrorMessage
+from PyQt5.QtWidgets import QApplication, QMainWindow,QErrorMessage
 from PyQt5.QtSql import QSqlQueryModel, QSqlQuery
 from PyQt5.QtCore import pyqtSlot, Qt, QDate
 from ui_faktureramera import Ui_MainWindow
@@ -12,7 +12,6 @@ import lib.fakturamodel as model
 from gui.jobForm import JobForm
 from gui.newcustomerform import NewCustomerForm
 
-import os
 import webbrowser
     
 # TODO: bryt ut denna till en egen klass i gui katalogen
@@ -25,9 +24,7 @@ class FaktureraMeraWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.newCustomerActivated = False
         self.ui.setupUi(self)
-        historyModel = QSqlQueryModel()
-        self.initializeHistoryModel(historyModel)
-        self.ui.tableView.setModel(historyModel)
+        self.updateHistoryTable()
         job = JobForm()
         self.jobList = [job]
         self.ui.jobsLayout.addWidget(job)
@@ -147,6 +144,7 @@ class FaktureraMeraWindow(QMainWindow):
          print("file does NOT exist")
 
       fileName = pdf.generate()
+      self.updateHistoryTable()
       webbrowser.open(fileName) 
       
 
@@ -167,6 +165,20 @@ class FaktureraMeraWindow(QMainWindow):
       job = self.jobList[-1]
       self.ui.jobsLayout.removeWidget(job)
       self.jobList = self.jobList[0:-1]
+
+
+   @pyqtSlot()
+   def on_maculateButton_clicked(self):
+      """"""
+      idx = self.ui.tableView.selectionModel().currentIndex()
+      if idx.row() == -1:
+         return
+
+      model = self.ui.tableView.model()
+      idx = model.index(idx.row(), 0)
+      billId = int(model.data(idx))
+      self.deleteBill(billId)
+      self.updateHistoryTable()
 
 
    @pyqtSlot()
@@ -252,8 +264,19 @@ class FaktureraMeraWindow(QMainWindow):
       return bill
 
       
-         
+   def deleteBill(self,billId):
+      """"""
+      query = QSqlQuery()
+      if not query.exec_('delete from bill where id =' + str(billId)):
+         print("Det gick inte sa bra")
 
+
+   def updateHistoryTable(self):
+      """"""
+      historyModel = QSqlQueryModel()
+      self.initializeHistoryModel(historyModel)
+      self.ui.tableView.setModel(historyModel)
+      
 
    def initializeHistoryModel(self, model):
       model.setQuery('select id,reference,bill_date,payed,payed_date from bill')

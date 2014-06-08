@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'faktureramera.ui'
 #
-# Created: Sun May  4 21:32:33 2014
+# Created: Thu Jun  5 18:52:52 2014
 #      by: PyQt5 UI code generator 5.0.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -104,6 +104,9 @@ class Ui_MainWindow(object):
         self.groupBox.setObjectName("groupBox")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.groupBox)
         self.horizontalLayout.setObjectName("horizontalLayout")
+        self.maculateButton = QtWidgets.QPushButton(self.groupBox)
+        self.maculateButton.setObjectName("maculateButton")
+        self.horizontalLayout.addWidget(self.maculateButton)
         spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem3)
         self.generateButton = QtWidgets.QPushButton(self.groupBox)
@@ -122,7 +125,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -137,6 +140,7 @@ class Ui_MainWindow(object):
         self.removeJobButton.setText(_translate("MainWindow", "Ta bort jobb"))
         self.saveGenerateButton.setText(_translate("MainWindow", "Generera"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Fakturera"))
+        self.maculateButton.setText(_translate("MainWindow", "Makulera"))
         self.generateButton.setText(_translate("MainWindow", "Generera"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Historik"))
 
