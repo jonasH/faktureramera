@@ -13,6 +13,7 @@ from gui.jobForm import JobForm
 from gui.newcustomerform import NewCustomerForm
 
 import webbrowser
+import os
     
 # TODO: bryt ut denna till en egen klass i gui katalogen
 class FaktureraMeraWindow(QMainWindow):
@@ -81,7 +82,7 @@ class FaktureraMeraWindow(QMainWindow):
          if j.ui.description.text() == "":
             errorMsgs.append("Du har glömt beskrivning på job " + str(counter))
          try:
-            int( j.ui.price.text())
+            float( j.ui.price.text().replace(",","."))
          except Exception:
             errorMsgs.append("Det ser inte ut som en siffra på priset på job " + str(counter))
          try:
@@ -131,7 +132,7 @@ class FaktureraMeraWindow(QMainWindow):
       bill.setCustomer(customer)
       for j in self.jobList:
          text = j.ui.description.text()
-         price = int( j.ui.price.text())
+         price = float( j.ui.price.text().replace(",","."))
          number = int( j.ui.number.text())
          job = self.newJob(price,number, text, bill.id)
          bill.addJob(job)
@@ -144,10 +145,22 @@ class FaktureraMeraWindow(QMainWindow):
          print("file does NOT exist")
 
       fileName = pdf.generate()
+      for i in self.jobList:
+         self.removeJobWidget()
+      self.on_addJobButton_clicked()
+      self.ui.referenceField.clear()
+      self.hideNewCustomer()
       self.updateHistoryTable()
-      webbrowser.open(fileName) 
+      self.populateCustomers()
+      pwd = os.getcwd()
+      webbrowser.open(os.path.join(pwd,fileName)) 
+
       
 
+   def removeJobWidget(self):
+      job = self.jobList[-1]
+      self.ui.jobsLayout.removeWidget(job)
+      self.jobList = self.jobList[0:-1]
       
       
    
@@ -162,10 +175,7 @@ class FaktureraMeraWindow(QMainWindow):
    def on_removeJobButton_clicked(self):
       if len(self.jobList) == 1:
          return
-      job = self.jobList[-1]
-      self.ui.jobsLayout.removeWidget(job)
-      self.jobList = self.jobList[0:-1]
-
+      self.removeJobWidget()
 
    @pyqtSlot()
    def on_maculateButton_clicked(self):
@@ -198,21 +208,29 @@ class FaktureraMeraWindow(QMainWindow):
          print("file does NOT exist")
 
       fileName = pdf.generate()
-      webbrowser.open(fileName) 
+      pwd = os.getcwd()
+      webbrowser.open(os.path.join(pwd,fileName)) 
       
-
-
-   @pyqtSlot()
-   def on_newCustomerButton_clicked(self):
-##TODO: det ska gå att ta bort newcustmerform
-      if self.newCustomerActivated == True:
-         self.newCustomerActivated = False
-         self.newCustomerForm.hide()
-         self.ui.newCustomerButton.setText("Ny")
-      else:
+   def showNewCustomer(self):
+      if self.newCustomerActivated == False:
+         self.ui.customerChooser.setEnabled(False)
          self.newCustomerActivated = True
          self.newCustomerForm.show()
          self.ui.newCustomerButton.setText("Ångra")
+
+   def hideNewCustomer(self):
+      if self.newCustomerActivated == True:
+         self.ui.customerChooser.setEnabled(True)
+         self.newCustomerActivated = False
+         self.newCustomerForm.hide()
+         self.ui.newCustomerButton.setText("Ny")      
+
+   @pyqtSlot()
+   def on_newCustomerButton_clicked(self):
+      if self.newCustomerActivated == True:
+         self.hideNewCustomer()
+      else:
+         self.showNewCustomer()
 
    def extractBill(self, query):
       id = query.value(0)
