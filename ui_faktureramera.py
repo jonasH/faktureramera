@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'faktureramera.ui'
 #
-# Created: Thu Jun  5 18:52:52 2014
+# Created: Wed Aug 20 21:11:26 2014
 #      by: PyQt5 UI code generator 5.0.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -68,9 +68,19 @@ class Ui_MainWindow(object):
         self.jobsGroup.setObjectName("jobsGroup")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.jobsGroup)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.scrollArea = QtWidgets.QScrollArea(self.jobsGroup)
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setObjectName("scrollArea")
+        self.scrollAreaWidgetContents = QtWidgets.QWidget()
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 732, 231))
+        self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
+        self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
+        self.verticalLayout_6.setObjectName("verticalLayout_6")
         self.jobsLayout = QtWidgets.QVBoxLayout()
         self.jobsLayout.setObjectName("jobsLayout")
-        self.horizontalLayout_3.addLayout(self.jobsLayout)
+        self.verticalLayout_6.addLayout(self.jobsLayout)
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+        self.horizontalLayout_3.addWidget(self.scrollArea)
         self.verticalLayout_2.addWidget(self.jobsGroup)
         self.groupBox_3 = QtWidgets.QGroupBox(self.tab)
         self.groupBox_3.setMaximumSize(QtCore.QSize(16777215, 75))
@@ -125,7 +135,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
