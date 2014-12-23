@@ -1,6 +1,9 @@
 uitopythontool=pyuic5
 
 
+.PHONY tags:
+	find . -name "*.py" | etags -
+
 .PHONY all: ui_faktureramera.py ui_jobform.py ui_newcustomerform.py
 
 ui_faktureramera.py: faktureramera.ui

@@ -14,7 +14,7 @@ from gui.newcustomerform import NewCustomerForm
 
 import webbrowser
 import os
-    
+      
 # TODO: bryt ut denna till en egen klass i gui katalogen
 class FaktureraMeraWindow(QMainWindow):
 
@@ -106,7 +106,41 @@ class FaktureraMeraWindow(QMainWindow):
       return True
          
             
-            
+   @pyqtSlot()
+   def on_editBillButton_clicked(self):
+      self.ui.tabWidget.setCurrentIndex(0)
+      self.reinitUI()
+      billId = self.__getBillidFromHistory()
+      if billId == -1:
+         return
+      bill = self.getBillData(billId)
+      print(len(bill.jobs))
+      self.poulateBillData(bill)
+
+
+
+   def poulateBillData(self, bill):
+      """"""
+      self.ui.customerChooser.setCurrentIndex(bill.customer.id - 1)
+      self.ui.referenceField.setText(bill.reference)
+      for j in bill.jobs:
+         #TODO:  somewhat ugly test
+         if self.jobList[-1].ui.description.text() != "":
+            self.on_addJobButton_clicked()
+         job = self.jobList[-1]
+         job.ui.description.setText(j.text)
+         job.ui.number.setText(str(j.number))
+         job.ui.price.setText(str(j.price))
+         
+
+   def reinitUI(self):
+      numberOfJobs = len(self.jobList)
+      for i in range(numberOfJobs):
+         self.removeJobWidget()
+      self.on_addJobButton_clicked()
+      self.ui.referenceField.clear()
+      self.hideNewCustomer()
+  
 
    @pyqtSlot()
    def on_saveGenerateButton_clicked(self):
@@ -128,7 +162,7 @@ class FaktureraMeraWindow(QMainWindow):
          customer = self.extractCustomer(query)
 
       customerId = customer.id
-      bill = self.newBill(self.ui.referenceField.text(),customerId)
+      bill = self.newBill(self.ui.referenceField.text(), customerId)
       bill.setCustomer(customer)
       for j in self.jobList:
          text = j.ui.description.text()
@@ -145,13 +179,9 @@ class FaktureraMeraWindow(QMainWindow):
          print("file does NOT exist")
 
       fileName = pdf.generate()
-      for i in self.jobList:
-         self.removeJobWidget()
-      self.on_addJobButton_clicked()
-      self.ui.referenceField.clear()
-      self.hideNewCustomer()
+      self.reinitUI()
       self.updateHistoryTable()
-      self.populateCustomers()
+      self.populateCustomers()  
       pwd = os.getcwd()
       webbrowser.open(os.path.join(pwd,fileName)) 
 
@@ -159,8 +189,13 @@ class FaktureraMeraWindow(QMainWindow):
 
    def removeJobWidget(self):
       job = self.jobList[-1]
+      job.hide()
       self.ui.jobsLayout.removeWidget(job)
-      self.jobList = self.jobList[0:-1]
+      QApplication.processEvents()
+      print("before" + str(len(self.jobList)))
+      self.jobList.remove(job)
+      print("after" + str(len(self.jobList)))
+
       
       
    
@@ -169,6 +204,7 @@ class FaktureraMeraWindow(QMainWindow):
       job = JobForm()
       self.ui.jobsLayout.addWidget(job)
       self.jobList.append(job)
+      QApplication.processEvents()
       
 
    @pyqtSlot()
@@ -177,29 +213,33 @@ class FaktureraMeraWindow(QMainWindow):
          return
       self.removeJobWidget()
 
+
    @pyqtSlot()
    def on_maculateButton_clicked(self):
       """"""
-      idx = self.ui.tableView.selectionModel().currentIndex()
-      if idx.row() == -1:
+      billId = self.__getBillidFromHistory()      
+      if billId == -1:
          return
 
-      model = self.ui.tableView.model()
-      idx = model.index(idx.row(), 0)
-      billId = int(model.data(idx))
       self.deleteBill(billId)
       self.updateHistoryTable()
 
 
-   @pyqtSlot()
-   def on_generateButton_clicked(self):
+   def __getBillidFromHistory(self):
       idx = self.ui.tableView.selectionModel().currentIndex()
       if idx.row() == -1:
-         return
+         return -1
 
       model = self.ui.tableView.model()
       idx = model.index(idx.row(), 0)
       billId = int(model.data(idx))
+      return billId
+
+   @pyqtSlot()
+   def on_generateButton_clicked(self):
+      billId = self.__getBillidFromHistory()
+      if billId == -1:
+         return
       bill = self.getBillData(billId)
       pdf = pdflib.BillGenerator(bill)
       if pdf.fileExsists:

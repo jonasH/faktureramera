@@ -2,9 +2,7 @@
 # TODO: generate getters/setters
 class Job():
 #id  hours price   job
-    price = 0
-    number = 0
-    text = ""
+
     def __init__(self, price, number,text ):
         self.price = price
         self.number = number
@@ -12,10 +10,6 @@ class Job():
 
 class Customer():
 # id name  address   zipcode
-    id = 0
-    name = ""
-    address = ""
-    zipcode = ""
 
     def __init__(self,id,name,address, zipcode):
         """"""
@@ -26,15 +20,11 @@ class Customer():
 # TODO: generate getters/setters
 class Bill():
 #  id  reference bill_date  payed  payed_date
-    customer = None
-    jobs = []
-    id = 0
-    reference = ""
-    bill_date = ""
-    payed = False
-    payed_date = None
+
     
-    def __init__(self,id,reference,bill_date,payed = False,payed_date = None):
+    def __init__(self, id, reference, bill_date, payed=False, payed_date=None):
+        self.customer = None
+        self.jobs = []
         self.id,self.reference,self.bill_date,self.payed,self.payed_date = id,reference,bill_date,payed,payed_date
 
     
