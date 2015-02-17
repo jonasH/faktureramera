@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'faktureramera.ui'
+# Form implementation generated from reading ui file 'gui/faktureramera.ui'
 #
-# Created: Sun Sep 28 21:27:01 2014
-#      by: PyQt5 UI code generator 5.0.1
+# Created: Tue Dec 23 16:09:42 2014
+#      by: PyQt5 UI code generator 5.3.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -42,7 +42,7 @@ class Ui_MainWindow(object):
         self.newCustomerButton = QtWidgets.QPushButton(self.customerGroup)
         self.newCustomerButton.setMaximumSize(QtCore.QSize(100, 16777215))
         self.newCustomerButton.setObjectName("newCustomerButton")
-        self.verticalLayout_4.addWidget(self.newCustomerButton)
+        self.verticalLayout_4.addWidget(self.newCustomerButton, QtCore.Qt.AlignRight)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_4.addItem(spacerItem)
         self.groupBox_2 = QtWidgets.QGroupBox(self.customerGroup)

@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'gui/newcustomerform.ui'
 #
-# Created: Sun Sep 28 21:27:01 2014
-#      by: PyQt5 UI code generator 5.0.1
+# Created: Tue Dec 23 16:09:42 2014
+#      by: PyQt5 UI code generator 5.3.2
 #
 # WARNING! All changes made in this file will be lost!
 
