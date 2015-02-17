@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets  import  QWidget, QMainWindow
+from PyQt5.QtWidgets import QWidget
 from gui.ui_newcustomerform import Ui_NewCustomerForm
+
 
 class NewCustomerForm(QWidget):
     
