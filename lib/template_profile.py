@@ -6,3 +6,4 @@ orgNr        = #string
 bankAccount  = #string
 tax          = #float
 billLocation = #string, relative to main.py
+companyName = # list of strings

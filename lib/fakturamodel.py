@@ -65,4 +65,5 @@ class Profile():
         self.orgNr        = profile.orgNr        
         self.bankAccount  = profile.bankAccount  
         self.tax          = profile.tax          
-        self.billLocation = profile.billLocation 
+        self.billLocation = profile.billLocation
+        self.companyName  = profile.companyName

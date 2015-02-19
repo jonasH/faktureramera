@@ -17,7 +17,7 @@ class BillGenerator():
     headingFont  = QFont("Times", 22)
     normalFont = QFont("Times", 12)
     fineFont = QFont("Times", 8)
-    
+    companyFont = QFont("Times", 18)
     painter = QPainter()
     normalRowDistance = 250
     
@@ -39,12 +39,18 @@ class BillGenerator():
         """Print a new bill"""
         # TODO: check if file exists!
         self.painter.begin(self.doc)
+        self.printCompanyName()
         self.printHeading()
         self.printInformation()
         self.printSpecificationTemplate()
         self.printSpecification()
         self.painter.end()
         return self.fileName
+
+    def printCompanyName(self):
+        self.painter.setFont(self.companyFont)
+        for i, txt in enumerate(self.profile.companyName):
+            self.painter.drawText(50, i * 350 + 200, txt)
 
     def printHeading(self):
         """Helper function for printing the header of the bill"""
