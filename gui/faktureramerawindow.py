@@ -28,6 +28,7 @@ class FaktureraMeraWindow(QMainWindow):
         self.newCustomerForm = NewCustomerForm()
         self.newCustomerForm.hide()
         self.ui.newCustomerLayout.addWidget(self.newCustomerForm)
+        self.edit_bill_id = 0
 
     def populateCustomers(self):
         query = QSqlQuery()
@@ -36,6 +37,20 @@ class FaktureraMeraWindow(QMainWindow):
         while query.next():
             c = self.extractCustomer(query)
             self.ui.customerChooser.addItem(c.name)
+
+    def updateBill(self, bill_id, reference, cId):
+        dateFormat = 'yyyy-MM-dd'
+        date = QDate.currentDate()
+        query = QSqlQuery()
+        sql = "update bill set c_id={0}, reference='{1}', bill_date='{2}' where id='{3}'".format(cId, reference,
+                                                                                        date.toString(dateFormat),
+                                                                                           bill_id)
+        query.exec_(sql)
+        sql = "delete from jobs where b_id='{0}'".format(bill_id)
+        query.exec_(sql)
+        query.exec_("select id, c_id, reference, bill_date from bill where id='{0}'".format(bill_id))
+        query.next()
+        return self.extractBill(query)
 
     def newBill(self, reference, cId):
         """"""
@@ -103,6 +118,9 @@ class FaktureraMeraWindow(QMainWindow):
             return False
         return True
 
+    @pyqtSlot()
+    def on_zeroButton_clicked(self):
+        self.reinitUI()
 
     @pyqtSlot()
     def on_editBillButton_clicked(self):
@@ -112,8 +130,9 @@ class FaktureraMeraWindow(QMainWindow):
         if billId == -1:
             return
         bill = self.getBillData(billId)
-        print(len(bill.jobs))
         self.poulateBillData(bill)
+        self.edit_bill_id = billId
+        self.ui.saveGenerateButton.setText("Uppdatera")
 
 
     def poulateBillData(self, bill):
@@ -131,6 +150,8 @@ class FaktureraMeraWindow(QMainWindow):
 
 
     def reinitUI(self):
+        self.edit_bill_id = 0
+        self.ui.saveGenerateButton.setText("Generera")
         numberOfJobs = len(self.jobList)
         for i in range(numberOfJobs):
             self.removeJobWidget()
@@ -144,9 +165,7 @@ class FaktureraMeraWindow(QMainWindow):
         if not self.validateForSubmit():
             return
         query = QSqlQuery()
-        dateFormat = 'yyyy-MM-dd'
-        date = QDate.currentDate()
-        customer = None
+
         if self.newCustomerActivated:
             name = self.newCustomerForm.ui.name.text()
             address = self.newCustomerForm.ui.address.text()
@@ -159,7 +178,11 @@ class FaktureraMeraWindow(QMainWindow):
             customer = self.extractCustomer(query)
 
         customerId = customer.id
-        bill = self.newBill(self.ui.referenceField.text(), customerId)
+        reference = self.ui.referenceField.text()
+        if self.edit_bill_id == 0:
+            bill = self.newBill(reference, customerId)
+        else:
+            bill = self.updateBill(self.edit_bill_id, reference, customerId)
         bill.setCustomer(customer)
         for j in self.jobList:
             text = j.ui.description.text()
@@ -170,11 +193,6 @@ class FaktureraMeraWindow(QMainWindow):
 
         # kodduplikat, lägg ut i fun
         pdf = pdflib.BillGenerator(bill)
-        if pdf.fileExsists:
-            print("file exists")
-        else:
-            print("file does NOT exist")
-
         fileName = pdf.generate()
         self.reinitUI()
         self.updateHistoryTable()
@@ -236,24 +254,20 @@ class FaktureraMeraWindow(QMainWindow):
             return
         bill = self.getBillData(billId)
         pdf = pdflib.BillGenerator(bill)
-        if pdf.fileExsists:
-            print("file exists")
-        else:
-            print("file does NOT exist")
 
         fileName = pdf.generate()
         pwd = os.getcwd()
         webbrowser.open(os.path.join(pwd, fileName))
 
     def showNewCustomer(self):
-        if self.newCustomerActivated == False:
+        if not self.newCustomerActivated:
             self.ui.customerChooser.setEnabled(False)
             self.newCustomerActivated = True
             self.newCustomerForm.show()
             self.ui.newCustomerButton.setText("Ångra")
 
     def hideNewCustomer(self):
-        if self.newCustomerActivated == True:
+        if self.newCustomerActivated:
             self.ui.customerChooser.setEnabled(True)
             self.newCustomerActivated = False
             self.newCustomerForm.hide()
@@ -261,7 +275,7 @@ class FaktureraMeraWindow(QMainWindow):
 
     @pyqtSlot()
     def on_newCustomerButton_clicked(self):
-        if self.newCustomerActivated == True:
+        if self.newCustomerActivated:
             self.hideNewCustomer()
         else:
             self.showNewCustomer()

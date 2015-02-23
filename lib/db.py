@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from PyQt5.QWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtSql import (QSqlQuery, QSqlDatabase)
 
 import os

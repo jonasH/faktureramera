@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui/faktureramera.ui'
 #
-# Created: Tue Dec 23 16:09:42 2014
+# Created: Mon Feb 23 20:51:24 2015
 #      by: PyQt5 UI code generator 5.3.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -94,6 +94,9 @@ class Ui_MainWindow(object):
         self.removeJobButton = QtWidgets.QPushButton(self.groupBox_3)
         self.removeJobButton.setObjectName("removeJobButton")
         self.horizontalLayout_2.addWidget(self.removeJobButton)
+        self.zeroButton = QtWidgets.QPushButton(self.groupBox_3)
+        self.zeroButton.setObjectName("zeroButton")
+        self.horizontalLayout_2.addWidget(self.zeroButton)
         spacerItem2 = QtWidgets.QSpacerItem(640, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem2)
         self.saveGenerateButton = QtWidgets.QPushButton(self.groupBox_3)
@@ -138,7 +141,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -151,6 +154,7 @@ class Ui_MainWindow(object):
         self.jobsGroup.setTitle(_translate("MainWindow", "Jobb"))
         self.addJobButton.setText(_translate("MainWindow", "Nytt jobb"))
         self.removeJobButton.setText(_translate("MainWindow", "Ta bort jobb"))
+        self.zeroButton.setText(_translate("MainWindow", "Nollställ"))
         self.saveGenerateButton.setText(_translate("MainWindow", "Generera"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Fakturera"))
         self.maculateButton.setText(_translate("MainWindow", "Makulera"))

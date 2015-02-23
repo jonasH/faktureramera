@@ -28,8 +28,9 @@ class BillGenerator():
         self.profile = fakturamodel.Profile()
         if not os.path.exists(self.profile.billLocation):
             os.mkdir(self.profile.billLocation)
-        print(bill.id)
-        self.fileName = self.profile.billLocation + str(bill.id) + "-" + bill.customer.name + ".pdf"
+
+        mod_name = bill.customer.name.replace('/', '')
+        self.fileName = self.profile.billLocation + str(bill.id) + "-" + mod_name + ".pdf"
         self.doc = QPdfWriter(self.fileName)
         self.fileExsists = os.path.exists(self.fileName)
 
@@ -82,7 +83,7 @@ class BillGenerator():
 
         if len(self.bill.customer.name) > 25:
             split = self.bill.customer.name.rsplit(' ')
-            self.painter.drawText(xSecond, yFirst, " ".join(split[0:floor(len(split) / 2)]))
+            self.painter.drawText(xSecond, yFirst, " ".join(split[0:ceil(len(split) / 2)]))
             self.painter.drawText(xSecond, yFirst + self.normalRowDistance, " ".join(split[ceil(len(split) / 2):]))
             self.painter.drawText(xSecond, yFirst + self.normalRowDistance * 2, self.bill.customer.address)
             self.painter.drawText(xSecond, yFirst + self.normalRowDistance * 3, self.bill.customer.zipcode)
