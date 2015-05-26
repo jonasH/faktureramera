@@ -124,8 +124,16 @@ class BillGenerator():
         self.painter.drawText(self.margin * 7, yThirdLine + self.normalRowDistance * 4, "Totalt: ")
 
         self.painter.setFont(self.fineFont)
+        address = self.profile.address.split("\n")
         self.painter.drawText(self.margin, yThirdLine + self.normalRowDistance * 6,
-                              "Adress: " + self.profile.address)
+                              "Adress: " + address[0])
+        
+        if len(address) > 1:
+            for i, a in enumerate(address[1:]):
+                self.painter.drawText(self.margin,
+                                      yThirdLine + self.normalRowDistance * (6 + i + 1),
+                                      "             " + a)
+
         self.painter.drawText(self.margin * 4, yThirdLine + self.normalRowDistance * 6,
                               "Telefon: " + self.profile.telephone)
         self.painter.drawText(self.margin * 6, yThirdLine + self.normalRowDistance * 6,
