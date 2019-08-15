@@ -3,8 +3,7 @@
 import lib.db as db
 from gui.faktureramerawindow import FaktureraMeraWindow
 
-
-from PyQt5.QtWidgets import QApplication
+from PySide2.QtWidgets import QApplication
 
 if __name__ == '__main__':
     import sys
@@ -15,6 +14,6 @@ if __name__ == '__main__':
 
     faktureramera = FaktureraMeraWindow() 
     
-    faktureramera.show()    
+    faktureramera.ui.show()    
 
     sys.exit(app.exec_())

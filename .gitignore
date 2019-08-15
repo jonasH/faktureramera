@@ -1,6 +1,8 @@
 *pdf
 __pycache__
 .*
+*~
+*.autosave
 *#*
 *sqlite
 profile.py
