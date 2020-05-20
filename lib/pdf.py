@@ -20,12 +20,11 @@ def generate_pdf(bill: Bill) -> str:
     if not os.path.exists(profile.billLocation):
         os.mkdir(profile.billLocation)
 
-    mod_name = bill.customer.name.replace('/', '')
-    file_name =  f"{bill.id}-{mod_name}.pdf"
+    mod_name = bill.customer.name.replace("/", "")
+    file_name = f"{bill.id}-{mod_name}.pdf"
     file_name = os.path.join(profile.billLocation, file_name)
     doc = QPdfWriter(file_name)
     fileExsists = os.path.exists(file_name)
-
 
     # TODO: check if file exists!
     painter = QPainter()
@@ -57,15 +56,15 @@ def __print_heading(painter: QPainter) -> None:
     painter.drawText(doc.width() / 2 - 800, doc.height() / 14, "FAKTURA")
 
 
-def __printInformation(painter: QPainter, bill: Bill, profile: Profile) -> None: 
+def __printInformation(painter: QPainter, bill: Bill, profile: Profile) -> None:
     """Print two columns with information about the bill"""
     doc = painter.device()
     xFirst = doc.width() / 10
     yFirst = doc.height() / 10
     xSecond = doc.width() / 2 + doc.width() / 10
-    y, m, d = bill.bill_date.split('-')
+    y, m, d = bill.bill_date.split("-")
     date = QDate(int(y), int(m), int(d))
-    dateFormat = 'yyyy-MM-dd'
+    dateFormat = "yyyy-MM-dd"
     ##  TODO: make this number changable in the profile
     payDay = date.addDays(profile.daysToPay)
 
@@ -73,18 +72,26 @@ def __printInformation(painter: QPainter, bill: Bill, profile: Profile) -> None:
 
     # first column
     painter.drawText(xFirst, yFirst, "Datum: " + date.toString(dateFormat))
-    painter.drawText(xFirst, yFirst + normalRowDistance, "Fakturanummer: " + str(bill.id))
-    painter.drawText(xFirst, yFirst + normalRowDistance * 2,
-                          "Förfallodag: " + payDay.toString(dateFormat))
-    painter.drawText(xFirst, yFirst + normalRowDistance * 3, "Er Referens: " + bill.reference)
-
+    painter.drawText(
+        xFirst, yFirst + normalRowDistance, "Fakturanummer: " + str(bill.id)
+    )
+    painter.drawText(
+        xFirst,
+        yFirst + normalRowDistance * 2,
+        "Förfallodag: " + payDay.toString(dateFormat),
+    )
+    painter.drawText(
+        xFirst, yFirst + normalRowDistance * 3, "Er Referens: " + bill.reference
+    )
 
     # second column
 
     if len(bill.customer.name) > 25:
-        split = bill.customer.name.rsplit(' ')
-        painter.drawText(xSecond, yFirst, " ".join(split[0:ceil(len(split) / 2)]))
-        painter.drawText(xSecond, yFirst + normalRowDistance, " ".join(split[ceil(len(split) / 2):]))
+        split = bill.customer.name.rsplit(" ")
+        painter.drawText(xSecond, yFirst, " ".join(split[0 : ceil(len(split) / 2)]))
+        painter.drawText(
+            xSecond, yFirst + normalRowDistance, " ".join(split[ceil(len(split) / 2) :])
+        )
         painter.drawText(xSecond, yFirst + normalRowDistance * 2, bill.customer.address)
         painter.drawText(xSecond, yFirst + normalRowDistance * 3, bill.customer.zipcode)
     else:
@@ -107,13 +114,25 @@ def __printSpecificationTemplate(painter: QPainter, profile: Profile) -> None:
     painter.setPen(pen)
     margin = __calc_margin(painter)
     painter.drawLine(margin, yFirstLine, doc.width() - margin, yFirstLine)
-    painter.drawLine(margin, yFirstLine + normalRowDistance * 2,
-                          doc.width() - margin, yFirstLine + normalRowDistance * 2)
+    painter.drawLine(
+        margin,
+        yFirstLine + normalRowDistance * 2,
+        doc.width() - margin,
+        yFirstLine + normalRowDistance * 2,
+    )
     painter.drawLine(margin, yThirdLine, doc.width() - margin, yThirdLine)
-    painter.drawLine(doc.width() - margin * 3, yThirdLine + normalRowDistance * 3,
-                          doc.width() - margin, yThirdLine + normalRowDistance * 3)
-    painter.drawLine(margin, yThirdLine + normalRowDistance * 5,
-                          doc.width() - margin, yThirdLine + normalRowDistance * 5)
+    painter.drawLine(
+        doc.width() - margin * 3,
+        yThirdLine + normalRowDistance * 3,
+        doc.width() - margin,
+        yThirdLine + normalRowDistance * 3,
+    )
+    painter.drawLine(
+        margin,
+        yThirdLine + normalRowDistance * 5,
+        doc.width() - margin,
+        yThirdLine + normalRowDistance * 5,
+    )
     # text section
     painter.setFont(normalFont)
     painter.drawText(margin, yFirstLine + normalRowDistance, " Specification")
@@ -127,27 +146,40 @@ def __printSpecificationTemplate(painter: QPainter, profile: Profile) -> None:
 
     painter.setFont(fineFont)
     address = profile.address.split("\n")
-    painter.drawText(margin, yThirdLine + normalRowDistance * 6,
-                          "Adress: " + address[0])
+    painter.drawText(
+        margin, yThirdLine + normalRowDistance * 6, "Adress: " + address[0]
+    )
 
     if len(address) > 1:
         for i, a in enumerate(address[1:]):
-            painter.drawText(margin,
-                                  yThirdLine + normalRowDistance * (6 + i + 1),
-                                  "             " + a)
+            painter.drawText(
+                margin,
+                yThirdLine + normalRowDistance * (6 + i + 1),
+                "             " + a,
+            )
 
-    painter.drawText(margin * 4, yThirdLine + normalRowDistance * 6,
-                          "Telefon: " + profile.telephone)
-    painter.drawText(margin * 6, yThirdLine + normalRowDistance * 6,
-                          "Mail: " + profile.mail)
-    painter.drawText(margin * 8, yThirdLine + normalRowDistance * 6,
-                          "Momsreg.nr/org.nr: " + profile.orgNr)
-    painter.drawText(margin * 8, yThirdLine + normalRowDistance * 7,
-                          "Bankgiro " + profile.bankAccount)
-    painter.drawText(margin * 8, yThirdLine + normalRowDistance * 8,
-                          "Företaget innehar F-skattebevis ")
+    painter.drawText(
+        margin * 4, yThirdLine + normalRowDistance * 6, "Telefon: " + profile.telephone
+    )
+    painter.drawText(
+        margin * 6, yThirdLine + normalRowDistance * 6, "Mail: " + profile.mail
+    )
+    painter.drawText(
+        margin * 8,
+        yThirdLine + normalRowDistance * 6,
+        "Momsreg.nr/org.nr: " + profile.orgNr,
+    )
+    painter.drawText(
+        margin * 8,
+        yThirdLine + normalRowDistance * 7,
+        "Bankgiro " + profile.bankAccount,
+    )
+    painter.drawText(
+        margin * 8,
+        yThirdLine + normalRowDistance * 8,
+        "Företaget innehar F-skattebevis ",
+    )
 
-                       
 
 def __printSpecification(painter: QPainter, bill: Bill, profile: Profile) -> None:
     """"""
@@ -172,7 +204,13 @@ def __printSpecification(painter: QPainter, bill: Bill, profile: Profile) -> Non
         totalSum += job.price * job.number
         i += 1
 
-    painter.drawText(fourthCol, yThirdLine + normalRowDistance, "{:10.2f}".format(totalSum))
+    painter.drawText(
+        fourthCol, yThirdLine + normalRowDistance, "{:10.2f}".format(totalSum)
+    )
     tax = totalSum * profile.tax
-    painter.drawText(fourthCol, yThirdLine + normalRowDistance * 2, "{:10.2f}".format(tax))
-    painter.drawText(fourthCol, yThirdLine + normalRowDistance * 4, "{:10.2f}".format(totalSum + tax))
+    painter.drawText(
+        fourthCol, yThirdLine + normalRowDistance * 2, "{:10.2f}".format(tax)
+    )
+    painter.drawText(
+        fourthCol, yThirdLine + normalRowDistance * 4, "{:10.2f}".format(totalSum + tax)
+    )

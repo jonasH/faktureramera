@@ -15,7 +15,7 @@ def __calc_next_id(query: QSqlQuery, table: str) -> int:
 
 def create_customer(name: str, address: str, zip_code: str) -> QSqlQuery:
     query = QSqlQuery()
-    new_id = __calc_next_id(query, 'customer')
+    new_id = __calc_next_id(query, "customer")
     query.prepare("INSERT INTO customer VALUES(?, ?, ?, ?)")
     query.addBindValue(new_id)
     query.addBindValue(name)
@@ -34,7 +34,7 @@ def fetch_customer(customer_id: int) -> model.Customer:
     query.exec_()
     query.next()
     return extract_customer(query)
-    
+
 
 def extract_customer(query: QSqlQuery) -> model.Customer:
     customer_id = query.value(0)
@@ -43,13 +43,13 @@ def extract_customer(query: QSqlQuery) -> model.Customer:
     zipcode = query.value(3)
     return model.Customer(customer_id, name, address, zipcode)
 
-    
+
 def create_bill(reference: str, customer_id: int) -> model.Bill:
     """"""
     dateFormat = "yyyy-MM-dd"
     date = QDate.currentDate()
     query = QSqlQuery()
-    next_id = __calc_next_id(query, 'bill')
+    next_id = __calc_next_id(query, "bill")
     query.prepare("INSERT INTO bill VALUES(?, ?, ?, ?, 0, NULL)")
     query.addBindValue(next_id)
     query.addBindValue(customer_id)
@@ -75,7 +75,7 @@ def update_bill(bill_id: int, reference: str, customer_id: int) -> model.Bill:
     sql = "delete from jobs where b_id='{0}'".format(bill_id)
     query.exec_(sql)
     return fetch_bill(bill_id)
-    
+
 
 def fetch_bill(bill_id: int) -> model.Customer:
     query = QSqlQuery()
@@ -91,7 +91,7 @@ def fetch_bill(bill_id: int) -> model.Customer:
     jobs = extract_jobs(query)
     for j in jobs:
         bill.addJob(j)
-    return 
+    return
 
 
 def delete_bill(bill_id: int) -> None:
@@ -112,7 +112,7 @@ def extract_bill(query: QSqlQuery) -> model.Bill:
 
 def new_job(price: float, number: int, text: str, bill_id: int) -> model.Job:
     query = QSqlQuery()
-    next_id = __calc_next_id(query, 'jobs')
+    next_id = __calc_next_id(query, "jobs")
     query.prepare("INSERT INTO jobs VALUES(?, ?, ?, ?, ?)")
     query.addBindValue(next_id)
     query.addBindValue(bill_id)
@@ -121,7 +121,7 @@ def new_job(price: float, number: int, text: str, bill_id: int) -> model.Job:
     query.addBindValue(text)
     if not query.exec_():
         logging.error("Could not create new job.")
-    
+
     return fetch_job(next_id)
 
 

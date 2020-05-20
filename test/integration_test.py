@@ -13,7 +13,6 @@ def setup_test_database():
     yield
 
 
-
 def test_alot():
     customer = create_customer("jonas", "soerby", "802 55")
     assert customer.name == "jonas"
@@ -22,7 +21,7 @@ def test_alot():
     bill2 = update_bill(bill.id, "someoneelse", customer.id)
     assert bill2.reference == "someoneelse"
     job = new_job(12, 13, "ASDF", bill2.id)
-    
+
     assert job.price == 12
     assert job.number == 13
     assert job.text == "ASDF"
