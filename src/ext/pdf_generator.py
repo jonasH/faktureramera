@@ -4,6 +4,7 @@ from PySide2.QtGui import QFont, QPainter, QPdfWriter, QPen
 from PySide2.QtCore import QDate
 from math import ceil
 from domain.model import Bill, Profile
+from support import settings_folder
 
 HEADING_FONT = QFont("Times", 22)
 normalFont = QFont("Times", 12)
@@ -17,12 +18,13 @@ normalRowDistance = 250
 def generate_pdf(bill: Bill) -> str:
     bill = bill
     profile = Profile()
-    if not os.path.exists(profile.billLocation):
-        os.mkdir(profile.billLocation)
+    bill_location = os.path.join(settings_folder(), profile.billLocation)
+    if not os.path.exists(bill_location):
+        os.mkdir(bill_location)
 
     mod_name = bill.customer.name.replace("/", "")
     file_name = f"{bill.id}-{mod_name}.pdf"
-    file_name = os.path.join(profile.billLocation, file_name)
+    file_name = os.path.join(bill_location, file_name)
     doc = QPdfWriter(file_name)
 
     painter = QPainter()

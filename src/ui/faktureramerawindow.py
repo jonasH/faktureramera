@@ -5,10 +5,13 @@ from PySide2.QtCore import Qt, QFile
 from PySide2.QtUiTools import QUiLoader
 import os
 from domain.model import Job
+from support import resource_path
+
 
 
 def load_ui(filename):
     module_dir = os.path.dirname(__file__)
+    module_dir = resource_path(module_dir)
     file_name = os.path.join(module_dir, filename)
     qfile = QFile(file_name)
     qfile.open(QFile.ReadOnly)

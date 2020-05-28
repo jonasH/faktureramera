@@ -4,13 +4,15 @@ from PySide2.QtSql import QSqlQuery, QSqlDatabase
 from PySide2.QtCore import QDate
 import os
 from typing import List
+from support import resource_path
 
 
 def _configure_database(location: str) -> None:
     query = QSqlQuery()
     line = ""
     file_dir = os.path.dirname(__file__)
-    with open(os.path.join(file_dir, "../../misc/fm.sql")) as f:
+    file_dir = resource_path(file_dir)
+    with open(os.path.join(file_dir, "fm.sql")) as f:
         for row in f:
             row = row.strip()
             line += row

@@ -1,14 +1,14 @@
-CONFIGFILE=config.toml
+CONFIGFILE=config/config.toml
 
 ALL_FILES=$(shell find src -name "*.py")
 COVERAGE_FLAGS=--branch --source=ui,domain,ext -m pytest
 COVERAGE_REPORT_CMD=coverage report --show-missing && cp .coverage ../
-.PHONY: test check mypy flake8 format
+.PHONY: test check mypy flake8 format clean exe
 
-
+clean:
+	rm -rf build dist
 
 check: mypy flake8
-
 
 flake8:
 	flake8 --config $(CONFIGFILE) src
@@ -26,3 +26,5 @@ format:
 TAGS: $(ALL_FILES)
 	etags $(ALL_FILES)
 
+exe: clean
+	pyinstaller config/FaktureraMera.spec
