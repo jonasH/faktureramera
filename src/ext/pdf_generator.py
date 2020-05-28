@@ -3,7 +3,7 @@ import os
 from PySide2.QtGui import QFont, QPainter, QPdfWriter, QPen
 from PySide2.QtCore import QDate
 from math import ceil
-from lib.fakturamodel import Bill, Profile
+from domain.model import Bill, Profile
 
 HEADING_FONT = QFont("Times", 22)
 normalFont = QFont("Times", 12)
@@ -24,9 +24,7 @@ def generate_pdf(bill: Bill) -> str:
     file_name = f"{bill.id}-{mod_name}.pdf"
     file_name = os.path.join(profile.billLocation, file_name)
     doc = QPdfWriter(file_name)
-    fileExsists = os.path.exists(file_name)
 
-    # TODO: check if file exists!
     painter = QPainter()
     painter.begin(doc)
     __print_company_name(painter, profile)
@@ -65,7 +63,7 @@ def __printInformation(painter: QPainter, bill: Bill, profile: Profile) -> None:
     y, m, d = bill.bill_date.split("-")
     date = QDate(int(y), int(m), int(d))
     dateFormat = "yyyy-MM-dd"
-    ##  TODO: make this number changable in the profile
+    #  TODO: make this number changable in the profile
     payDay = date.addDays(profile.daysToPay)
 
     painter.setFont(normalFont)
@@ -88,9 +86,9 @@ def __printInformation(painter: QPainter, bill: Bill, profile: Profile) -> None:
 
     if len(bill.customer.name) > 25:
         split = bill.customer.name.rsplit(" ")
-        painter.drawText(xSecond, yFirst, " ".join(split[0 : ceil(len(split) / 2)]))
+        painter.drawText(xSecond, yFirst, " ".join(split[0: ceil(len(split) / 2)]))
         painter.drawText(
-            xSecond, yFirst + normalRowDistance, " ".join(split[ceil(len(split) / 2) :])
+            xSecond, yFirst + normalRowDistance, " ".join(split[ceil(len(split) / 2):])
         )
         painter.drawText(xSecond, yFirst + normalRowDistance * 2, bill.customer.address)
         painter.drawText(xSecond, yFirst + normalRowDistance * 3, bill.customer.zipcode)
@@ -194,7 +192,7 @@ def __printSpecification(painter: QPainter, bill: Bill, profile: Profile) -> Non
     painter.setFont(normalFont)
 
     i = 0
-    totalSum = 0
+    totalSum = 0.0
     for job in bill.jobs:
         yLine = yFirstLine + normalRowDistance * i
         painter.drawText(margin, yLine, job.text)

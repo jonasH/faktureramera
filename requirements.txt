@@ -1,2 +1,5 @@
 PySide2
 pytest
+flake8
+mypy
+pytest-cov
