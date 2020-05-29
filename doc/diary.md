@@ -1,7 +1,25 @@
 # Thursday 2020-05-29
 
+## QR code
 
-## Internationalization
+
+# due = kostnad
+# iref = ocr
+data = {
+    "uqr": 1,
+    "tp": 1,
+    "nme": "dsreda DEMO",
+    "cid": "123456-7890",
+    "iref": "130065",
+    "ddt": "20150621",
+    "due": 3407.0000,
+    "pt": "BG",
+    "acc": "123-4567",
+}
+
+
+install zbar to read qrcodes with zbarimg
+
 
 
 

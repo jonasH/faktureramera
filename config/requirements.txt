@@ -3,3 +3,4 @@ pytest
 flake8
 mypy
 pytest-cov
+qrcode[pil]
