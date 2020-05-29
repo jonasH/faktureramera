@@ -10,6 +10,5 @@ RUN tar xzf Python-3.8.3.tgz
 RUN cd Python-3.8.3 && ./configure --enable-optimizations && make altinstall
 RUN python3.8 -m pip install --upgrade pip
 COPY requirements.txt .
-RUN ls
 RUN python3.8 -m pip install -r requirements.txt
-RUN apt-get remove python
+RUN apt-get -y remove python
