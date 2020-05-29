@@ -8,7 +8,6 @@ from domain.model import Job
 from support import resource_path
 
 
-
 def load_ui(filename):
     module_dir = os.path.dirname(__file__)
     module_dir = resource_path(module_dir)
