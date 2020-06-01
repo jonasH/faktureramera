@@ -1,10 +1,9 @@
 import os
-
 from PySide2.QtGui import QFont, QPainter, QPdfWriter, QPen
 from PySide2.QtCore import QDate
 from math import ceil
 from domain.model import Bill, Profile
-from support import settings_folder
+
 
 HEADING_FONT = QFont("Times", 22)
 normalFont = QFont("Times", 12)
@@ -15,16 +14,13 @@ MARGIN_PERCENT = 10
 normalRowDistance = 250
 
 
-def generate_pdf(bill: Bill) -> str:
-    bill = bill
-    profile = Profile()
-    bill_location = os.path.join(settings_folder(), profile.billLocation)
-    if not os.path.exists(bill_location):
-        os.mkdir(bill_location)
+def generate_pdf(bill: Bill, location: str, profile: Profile) -> str:
+    if not os.path.exists(location):
+        os.mkdir(location)
 
     mod_name = bill.customer.name.replace("/", "")
     file_name = f"{bill.id}-{mod_name}.pdf"
-    file_name = os.path.join(bill_location, file_name)
+    file_name = os.path.join(location, file_name)
     doc = QPdfWriter(file_name)
 
     painter = QPainter()
@@ -45,7 +41,7 @@ def __calc_margin(painter: QPainter) -> float:
 
 def __print_company_name(painter: QPainter, profile: Profile) -> None:
     painter.setFont(companyFont)
-    for i, txt in enumerate(profile.companyName):
+    for i, txt in enumerate(profile.company_name):
         painter.drawText(50, i * 350 + 200, txt)
 
 
@@ -65,8 +61,7 @@ def __printInformation(painter: QPainter, bill: Bill, profile: Profile) -> None:
     y, m, d = bill.bill_date.split("-")
     date = QDate(int(y), int(m), int(d))
     dateFormat = "yyyy-MM-dd"
-    #  TODO: make this number changable in the profile
-    payDay = date.addDays(profile.daysToPay)
+    payDay = date.addDays(profile.days_to_pay)
 
     painter.setFont(normalFont)
 
@@ -167,12 +162,12 @@ def __printSpecificationTemplate(painter: QPainter, profile: Profile) -> None:
     painter.drawText(
         margin * 8,
         yThirdLine + normalRowDistance * 6,
-        "Momsreg.nr/org.nr: " + profile.orgNr,
+        "Momsreg.nr/org.nr: " + profile.org_nr,
     )
     painter.drawText(
         margin * 8,
         yThirdLine + normalRowDistance * 7,
-        "Bankgiro " + profile.bankAccount,
+        "Bankgiro " + profile.bank_account,
     )
     painter.drawText(
         margin * 8,

@@ -38,12 +38,16 @@ class Bill:
 @dataclass(frozen=True)
 class Profile:
 
-    daysToPay: int = 30
+    days_to_pay: int = 30
     address: str = "apagatan 30"
     mail: str = "joans@123.se"
     telephone: str = "070-123124"
-    orgNr: str = "28934234-234"
-    bankAccount: str = "235098238"
+    org_nr: str = "28934234-234"
+    bank_account: str = "235098238"
     tax: float = 0.3
-    billLocation: str = "billz"
-    companyName: str = "company 1"
+    company_name: str = "company 1"
+
+
+@dataclass(frozen=True)
+class AppSettings:
+    bill_location: str = "Bills"

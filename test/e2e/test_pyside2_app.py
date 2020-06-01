@@ -6,6 +6,8 @@ from domain.app import FM
 from ui.faktureramerawindow import FaktureraMeraWindow
 import os
 from unittest.mock import Mock, patch
+from ext.config_parser_settings import ConfigParserSettings
+from ext.pdf_generator import generate_pdf
 
 
 def __create_first_customer_and_bill(faktureramera, webbrowser, exp_report_path):
@@ -70,9 +72,11 @@ def test_long_name(webbrowser):
     if os.path.exists(test_db_name):
         os.unlink(test_db_name)
     db = PySide2SqliteDb(test_db_name)
-    exp_report_path = "Some/path"
-    generate_bill = Mock(return_value=exp_report_path)
-    fm = FM(db, generate_bill)
+    directory = os.path.dirname(__file__)
+    user_settings_folder = os.path.join(directory, "..", "..", "build", "test_settings")
+    exp_report_path = os.path.join(user_settings_folder, "Bills", '1-asfd.pdf')
+    settings = ConfigParserSettings(user_settings_folder)
+    fm = FM(db, generate_pdf, settings)
     faktureramera = FaktureraMeraWindow(fm)
     __create_first_customer_and_bill(faktureramera, webbrowser, exp_report_path)
     __regenerate_bill(faktureramera, webbrowser, exp_report_path)

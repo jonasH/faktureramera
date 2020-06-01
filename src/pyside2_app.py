@@ -1,6 +1,7 @@
 from PySide2.QtWidgets import QApplication
 from ext.pyside2_sqlite_db import PySide2SqliteDb
 from ext.pdf_generator import generate_pdf
+from ext.config_parser_settings import ConfigParserSettings
 from domain.app import FM
 from ui.faktureramerawindow import FaktureraMeraWindow
 import sys
@@ -15,7 +16,8 @@ def main():
         os.mkdir(user_settings_folder)
     db_path = os.path.join(user_settings_folder, "fm.sqlite")
     db = PySide2SqliteDb(db_path)
-    fm = FM(db, generate_pdf)
+    settings = ConfigParserSettings(user_settings_folder)
+    fm = FM(db, generate_pdf, settings)
     faktureramera = FaktureraMeraWindow(fm)
 
     faktureramera.ui.show()
