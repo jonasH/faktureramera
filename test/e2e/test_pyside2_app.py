@@ -70,9 +70,9 @@ def __maculate_bill(faktureramera):
 @pytest.fixture
 def user_settings_folder():
     directory = os.path.dirname(__file__)
-    user_settings_folder = os.path.join(directory, "..", "..", "build", "test_settings")
+    user_settings_folder = os.path.join(directory, "..", "..", "build", "e2e__settings")
     shutil.rmtree(user_settings_folder, ignore_errors=True)
-    os.mkdir(user_settings_folder)
+    os.makedirs(user_settings_folder)
     return user_settings_folder
 
 
