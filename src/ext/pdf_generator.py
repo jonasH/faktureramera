@@ -83,9 +83,9 @@ def __printInformation(painter: QPainter, bill: Bill, profile: Profile) -> None:
 
     if len(bill.customer.name) > 25:
         split = bill.customer.name.rsplit(" ")
-        painter.drawText(xSecond, yFirst, " ".join(split[0: ceil(len(split) / 2)]))
+        painter.drawText(xSecond, yFirst, " ".join(split[0 : ceil(len(split) / 2)]))
         painter.drawText(
-            xSecond, yFirst + normalRowDistance, " ".join(split[ceil(len(split) / 2):])
+            xSecond, yFirst + normalRowDistance, " ".join(split[ceil(len(split) / 2) :])
         )
         painter.drawText(xSecond, yFirst + normalRowDistance * 2, bill.customer.address)
         painter.drawText(xSecond, yFirst + normalRowDistance * 3, bill.customer.zipcode)

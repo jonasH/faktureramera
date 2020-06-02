@@ -17,13 +17,12 @@ def main():
     db_path = os.path.join(user_settings_folder, "fm.sqlite")
     db = PySide2SqliteDb(db_path)
     settings = ConfigParserSettings(user_settings_folder)
-    fm = FM(db, generate_pdf, settings)
-    faktureramera = FaktureraMeraWindow(fm)
+    with FM(db, generate_pdf, settings) as fm:
+        faktureramera = FaktureraMeraWindow(fm)
+        faktureramera.ui.show()
+        exit_val = app.exec_()
+    sys.exit(exit_val)
 
-    faktureramera.ui.show()
 
-    sys.exit(app.exec_())
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

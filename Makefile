@@ -1,6 +1,6 @@
 CONFIGFILE=config/config.toml
 ALL_FOLDERS=src test/integration_tests test/e2e
-ALL_FILES=$(shell find $(ALL_FOLDERS) -name "*.py")
+ALL_FILES=$(shell find $(ALL_FOLDERS) -name ".*" -prune -o -name "*.py" -print)
 .PHONY: test check mypy flake8 format clean exe integration-test
 
 
@@ -24,7 +24,7 @@ TAGS: $(ALL_FILES)
 check: mypy flake8
 
 build/flake8-report.txt: build $(ALL_FILES)
-	rm -f $@ && flake8 --config $(CONFIGFILE) $(ALL_FOLDERS) --output-file=$@ --tee
+	rm -f $@ && flake8 --config $(CONFIGFILE) $(ALL_FILES) --output-file=$@ --tee
 
 flake8: build/flake8-report.txt
 
@@ -50,3 +50,4 @@ e2etest: $(ALL_FILES) build
 # Installer
 exe: clean
 	pyinstaller config/FaktureraMera.spec
+

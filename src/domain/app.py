@@ -13,12 +13,15 @@ class FM(object):
         self.db = db
         self.settings = settings
 
-    def generate_bill(self, bill: Bill) -> str:
+    @property
+    def bills_location(self) -> str:
         app_settings = self.settings.app_settings()
         settings_folder = self.settings.settings_folder()
-        location = os.path.join(settings_folder, app_settings.bill_location)
-        profile = self.settings.profile()
-        return self.__generate_bill(bill, location, profile)
+        return os.path.join(settings_folder, app_settings.bill_location)
+
+    def generate_bill(self, bill: Bill) -> str:
+        profile = self.profile()
+        return self.__generate_bill(bill, self.bills_location, profile)
 
     def fetch_customers(self) -> CustomerGenerator:
         yield from self.db.fetch_customers()
@@ -50,5 +53,14 @@ class FM(object):
     def fetch_job(self, job_id: int) -> Job:
         return self.db.fetch_job(job_id)
 
-    def shut_down(self):
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
         self.settings.save()
+
+    def profile(self) -> Profile:
+        return self.settings.profile()
+
+    def save_profile(self, profile: Profile):
+        self.settings.save_profile(profile)

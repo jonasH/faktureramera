@@ -12,10 +12,13 @@ class AbstractSettings(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def save_profile(self, profile: Profile) -> None:
+        pass
+
+    @abc.abstractmethod
     def app_settings(self) -> AppSettings:
         pass
 
     @abc.abstractmethod
     def settings_folder(self) -> str:
         pass
-

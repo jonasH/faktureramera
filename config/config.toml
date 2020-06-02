@@ -5,3 +5,5 @@ ignore_missing_imports = True
 max-line-length = 88
 exclude = venv,.git
 max-complexity = 10
+# Incompatability between black and checker
+ignore = E203

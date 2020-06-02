@@ -62,6 +62,17 @@ class ConfigParserSettings(AbstractSettings):
     def settings_folder(self) -> str:
         return self.__settings_path
 
+    def save_profile(self, profile: Profile) -> None:
+        p = self.config["Profile"]
+        p["days_to_pay"] = str(profile.days_to_pay)
+        p["address"] = profile.address
+        p["mail"] = profile.mail
+        p["telephone"] = profile.telephone
+        p["org_nr"] = profile.org_nr
+        p["bank_account"] = profile.bank_account
+        p["tax"] = str(profile.tax)
+        p["company_name"] = profile.company_name
+
     def profile(self) -> Profile:
         profile = self.config["Profile"]
         days_to_pay = profile.getint("days_to_pay")

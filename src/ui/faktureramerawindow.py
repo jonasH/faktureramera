@@ -1,11 +1,17 @@
-import webbrowser
-from PySide2.QtWidgets import QApplication, QMainWindow, QErrorMessage, QPushButton
+from PySide2.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QErrorMessage,
+    QPushButton,
+)
 from PySide2.QtSql import QSqlQueryModel
 from PySide2.QtCore import Qt, QFile
 from PySide2.QtUiTools import QUiLoader
 import os
-from domain.model import Job
+from domain.model import Job, Profile
 from support import resource_path
+import platform
+import subprocess
 
 
 def load_ui(filename):
@@ -18,21 +24,38 @@ def load_ui(filename):
     return loader.load(qfile)
 
 
+def open_file(filepath):
+    if platform.system() == "Windows":  # Windows
+        os.startfile(filepath)
+    else:
+        subprocess.call(("xdg-open", filepath))
+
+
 class FaktureraMeraWindow(QMainWindow):
-    def __init__(self, app, parent=None):
+    def __init__(self, app, parent=None, load_data=True):
         """"""
         super(FaktureraMeraWindow, self).__init__(parent)
         self.app = app
-        self.setup_ui()
-        self.updateHistoryTable()
-        job = load_ui("jobform.ui")
-        self.jobList = [job]
-        self.ui.jobsLayout.addWidget(job)
-        self.populateCustomers()
-        self.newCustomerForm = load_ui("newcustomerform.ui")
-        self.newCustomerForm.hide()
-        self.ui.newCustomerLayout.addWidget(self.newCustomerForm)
         self.edit_bill_id = 0
+        self.setup_ui()
+        if load_data:
+            self.load_data()
+
+    def load_data(self):
+        self.updateHistoryTable()
+        self.populateCustomers()
+        self.load_settings_data()
+
+    def load_settings_data(self):
+        profile = self.app.profile()
+        self.ui.due_date_input.setValue(profile.days_to_pay)
+        self.ui.address_input.setText(profile.address)
+        self.ui.mail_input.setText(profile.mail)
+        self.ui.telephone_input.setText(profile.telephone)
+        self.ui.org_nr_input.setText(profile.org_nr)
+        self.ui.bank_no_input.setText(profile.bank_account)
+        self.ui.tax_input.setValue(profile.tax * 100)
+        self.ui.company_name_input.setText(profile.company_name)
 
     def setup_ui(self) -> None:
         self.ui = load_ui("faktureramera.ui")
@@ -52,6 +75,31 @@ class FaktureraMeraWindow(QMainWindow):
         btn.clicked.connect(self.on_maculateButton_clicked)
         btn = self.ui.findChild(QPushButton, "generateButton")
         btn.clicked.connect(self.on_generateButton_clicked)
+        btn = self.ui.findChild(QPushButton, "open_bills_btn")
+        btn.clicked.connect(self.on_open_bills)
+        btn = self.ui.findChild(QPushButton, "save_profile_btn")
+        btn.clicked.connect(self.on_save_profile)
+        self.newCustomerForm = load_ui("newcustomerform.ui")
+        self.newCustomerForm.hide()
+        self.ui.newCustomerLayout.addWidget(self.newCustomerForm)
+        job = load_ui("jobform.ui")
+        self.jobList = [job]
+        self.ui.jobsLayout.addWidget(job)
+
+    def on_open_bills(self):
+        open_file(self.app.bills_location)
+
+    def on_save_profile(self):
+        days_to_pay = int(self.ui.due_date_input.value())
+        address = self.ui.address_input.text()
+        mail = self.ui.mail_input.text()
+        tele = self.ui.telephone_input.text()
+        org_nr = self.ui.org_nr_input.text()
+        bank_account = self.ui.bank_no_input.text()
+        tax = float(self.ui.tax_input.value() / 100.0)
+        name = self.ui.company_name_input.text()
+        p = Profile(days_to_pay, address, mail, tele, org_nr, bank_account, tax, name)
+        self.app.save_profile(p)
 
     def populateCustomers(self) -> None:
         self.ui.customerChooser.clear()
@@ -166,7 +214,7 @@ class FaktureraMeraWindow(QMainWindow):
         self.reinitUI()
         self.updateHistoryTable()
         self.populateCustomers()
-        webbrowser.open(fileName)
+        open_file(fileName)
 
     def removeJobWidget(self):
         job = self.jobList[-1]
@@ -211,7 +259,7 @@ class FaktureraMeraWindow(QMainWindow):
             return
         bill = self.app.fetch_bill(billId)
         fileName = self.app.generate_bill(bill)
-        webbrowser.open(fileName)
+        open_file(fileName)
 
     @property
     def newCustomerActivated(self):

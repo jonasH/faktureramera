@@ -6,7 +6,9 @@ from unittest.mock import Mock
 
 @pytest.fixture(scope="session")
 def db():
-    database_name = "testdb.sqlite"
+    directory = os.path.dirname(__file__)
+    user_settings_folder = os.path.join(directory, "..", "..", "build", "test_settings")
+    database_name = os.path.join(user_settings_folder, "testdb.sqlite")
     if os.path.exists(database_name):
         os.unlink(database_name)
     db = PySide2SqliteDb(database_name)
