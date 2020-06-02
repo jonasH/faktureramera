@@ -5,7 +5,7 @@ from PySide2.QtWidgets import (
     QPushButton,
 )
 from PySide2.QtSql import QSqlQueryModel
-from PySide2.QtCore import Qt, QFile
+from PySide2.QtCore import Qt, QFile, QObject, QEvent
 from PySide2.QtUiTools import QUiLoader
 import os
 from domain.model import Job, Profile
@@ -31,12 +31,24 @@ def open_file(filepath):
         subprocess.call(("xdg-open", filepath))
 
 
+class NewJobFilter(QObject):
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.KeyPress and event.key() == Qt.Key_Tab:
+            self.parent().add_job_widget()
+            return True
+        else:
+            # standard event processing
+            return QObject.eventFilter(self, obj, event)
+
+
 class FaktureraMeraWindow(QMainWindow):
     def __init__(self, app, parent=None, load_data=True):
         """"""
         super(FaktureraMeraWindow, self).__init__(parent)
         self.app = app
         self.edit_bill_id = 0
+        self.tab_new_job_filter = NewJobFilter(self)
+        self.jobList = []
         self.setup_ui()
         if load_data:
             self.load_data()
@@ -82,9 +94,7 @@ class FaktureraMeraWindow(QMainWindow):
         self.newCustomerForm = load_ui("newcustomerform.ui")
         self.newCustomerForm.hide()
         self.ui.newCustomerLayout.addWidget(self.newCustomerForm)
-        job = load_ui("jobform.ui")
-        self.jobList = [job]
-        self.ui.jobsLayout.addWidget(job)
+        self.add_job_widget()
 
     def on_open_bills(self):
         open_file(self.app.bills_location)
@@ -163,7 +173,7 @@ class FaktureraMeraWindow(QMainWindow):
         self.ui.referenceField.setText(bill.reference)
         for j in bill.jobs:
             if self.jobList[-1].description.text() != "":
-                self.on_addJobButton_clicked()
+                self.add_job_widget()
             job = self.jobList[-1]
             job.description.setText(j.text)
             job.number.setText(str(j.number))
@@ -175,7 +185,7 @@ class FaktureraMeraWindow(QMainWindow):
         numberOfJobs = len(self.jobList)
         for i in range(numberOfJobs):
             self.removeJobWidget()
-        self.on_addJobButton_clicked()
+        self.add_job_widget()
         self.ui.referenceField.clear()
         self.hideNewCustomer()
 
@@ -223,10 +233,16 @@ class FaktureraMeraWindow(QMainWindow):
         QApplication.processEvents()
         self.jobList.remove(job)
 
-    def on_addJobButton_clicked(self):
+    def add_job_widget(self,):
+        if len(self.jobList) > 0:
+            self.jobList[-1].number.removeEventFilter(self.tab_new_job_filter)
         job = load_ui("jobform.ui")
         self.ui.jobsLayout.addWidget(job)
         self.jobList.append(job)
+        job.number.installEventFilter(self.tab_new_job_filter)
+
+    def on_addJobButton_clicked(self):
+        self.add_job_widget()
         QApplication.processEvents()
 
     def on_removeJobButton_clicked(self):
