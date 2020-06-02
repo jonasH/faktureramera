@@ -3,7 +3,8 @@ from PySide2.QtGui import QFont, QPainter, QPdfWriter, QPen
 from PySide2.QtCore import QDate
 from math import ceil
 from domain.model import Bill, Profile
-
+from typing import List, Generator
+from collections import deque
 
 HEADING_FONT = QFont("Times", 22)
 normalFont = QFont("Times", 12)
@@ -12,6 +13,8 @@ companyFont = QFont("Times", 18)
 MARGIN_PERCENT = 10
 
 normalRowDistance = 250
+
+MAX_LINE = 50
 
 
 def generate_pdf(bill: Bill, location: str, profile: Profile) -> str:
@@ -176,6 +179,43 @@ def __printSpecificationTemplate(painter: QPainter, profile: Profile) -> None:
     )
 
 
+def __split_too_long_words(words: List[str]) -> Generator[str, None, None]:
+    words_to_process = deque(words)
+    while len(words_to_process) > 0:
+        word = words_to_process.popleft()
+        if len(word) > MAX_LINE:
+            first_part = word[:MAX_LINE]
+            yield first_part + "-"
+            second_part = word[MAX_LINE:]
+            words_to_process.extendleft([second_part])
+        else:
+            yield word
+
+
+def split_text(text: str) -> List[str]:
+    res = []
+    words = list(__split_too_long_words(text.split()))
+    line = words[0]
+    for word in words[1:]:
+        if len(line) + len(word) + 1 > MAX_LINE:  # account for whitespace
+            res.append(line)
+            line = word
+        else:
+            line += " " + word
+    res.append(line)
+    return res
+
+
+def __print_spec_text(painter: QPainter, y_line: int, margin: float, text: str) -> int:
+    splitted_text = split_text(text)
+    painter.drawText(margin, y_line, splitted_text[0])
+    for t in splitted_text[1:]:
+        y_line += normalRowDistance
+        painter.drawText(margin, y_line, t)
+
+    return y_line
+
+
 def __printSpecification(painter: QPainter, bill: Bill, profile: Profile) -> None:
     """"""
     # TODO:  globlaize column sync with above
@@ -188,16 +228,15 @@ def __printSpecification(painter: QPainter, bill: Bill, profile: Profile) -> Non
     fourthCol = margin * 8
     painter.setFont(normalFont)
 
-    i = 0
     totalSum = 0.0
+    y_line = yFirstLine
     for job in bill.jobs:
-        yLine = yFirstLine + normalRowDistance * i
-        painter.drawText(margin, yLine, job.text)
-        painter.drawText(secondCol, yLine, str(job.number))
-        painter.drawText(thirdCol, yLine, "{:10.2f}".format(job.price))
-        painter.drawText(fourthCol, yLine, "{:10.2f}".format(job.price * job.number))
+        y_line = __print_spec_text(painter, y_line, margin, job.text)
+        painter.drawText(secondCol, y_line, str(job.number))
+        painter.drawText(thirdCol, y_line, "{:10.2f}".format(job.price))
+        painter.drawText(fourthCol, y_line, "{:10.2f}".format(job.price * job.number))
         totalSum += job.price * job.number
-        i += 1
+        y_line += normalRowDistance
 
     painter.drawText(
         fourthCol, yThirdLine + normalRowDistance, "{:10.2f}".format(totalSum)

@@ -1,7 +1,6 @@
 from PySide2.QtWidgets import QApplication
 from ext.pyside2_sqlite_db import PySide2SqliteDb
 
-# from ext.pdf_generator import generate_pdf
 from domain.app import FM
 from ui.faktureramerawindow import FaktureraMeraWindow
 import os
@@ -23,8 +22,8 @@ def __create_first_customer_and_bill(faktureramera, open_file, exp_report_path):
     job_form = faktureramera.jobList[0]
 
     job_form.description.setText("asfd")
-    job_form.price.setText("300")
-    job_form.number.setText("40")
+    job_form.price.setValue(300)
+    job_form.number.setValue(40)
 
     # Add job, remove job
     faktureramera.on_addJobButton_clicked()
@@ -53,8 +52,8 @@ def __change_bill(faktureramera, open_file, exp_report_path):
     job_form = faktureramera.jobList[1]
 
     job_form.description.setText("aqqqsfd")
-    job_form.price.setText("305")
-    job_form.number.setText("42")
+    job_form.price.setValue(305)
+    job_form.number.setValue(42)
     faktureramera.on_saveGenerateButton_clicked()
     open_file.assert_called_once_with(exp_report_path)
     open_file.reset_mock()

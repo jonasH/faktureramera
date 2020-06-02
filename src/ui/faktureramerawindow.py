@@ -11,6 +11,7 @@ import os
 from domain.model import Job, Profile
 from support import resource_path
 import platform
+from typing import List
 import subprocess
 
 
@@ -100,13 +101,13 @@ class FaktureraMeraWindow(QMainWindow):
         open_file(self.app.bills_location)
 
     def on_save_profile(self):
-        days_to_pay = int(self.ui.due_date_input.value())
+        days_to_pay = self.ui.due_date_input.value()
         address = self.ui.address_input.text()
         mail = self.ui.mail_input.text()
         tele = self.ui.telephone_input.text()
         org_nr = self.ui.org_nr_input.text()
         bank_account = self.ui.bank_no_input.text()
-        tax = float(self.ui.tax_input.value() / 100.0)
+        tax = self.ui.tax_input.value() / 100.0
         name = self.ui.company_name_input.text()
         p = Profile(days_to_pay, address, mail, tele, org_nr, bank_account, tax, name)
         self.app.save_profile(p)
@@ -116,40 +117,39 @@ class FaktureraMeraWindow(QMainWindow):
         for c in self.app.fetch_customers():
             self.ui.customerChooser.addItem(c.name)
 
-    def validateForSubmit(self):
-        errorMsgs = []
+    def __validate_job(self, j, counter: int) -> List[str]:
+        error_msgs = []
+        if j.description.text() == "":
+            error_msgs.append(f"Description is empty for job {counter}")
+        if j.price.value() == 0.0:
+            error_msgs.append(f"Price is zero for job {counter}")
+        if j.number.value() == 0:
+            error_msgs.append(f"Number is zero for job {counter}")
+        return error_msgs
+
+    def __validate_new_customer(self) -> List[str]:
+        err_msgs = []
+        if self.newCustomerForm.name.text() == "":
+            err_msgs.append("Det finns inget namn pa den nya kunden")
+        if self.newCustomerForm.address.text() == "":
+            err_msgs.append("Det finns ingen address pa den nya kunden")
+        if self.newCustomerForm.zip.text() == "":
+            err_msgs.append("Det finns inget postnummer pa den nya kunden")
+        return err_msgs
+
+    def validate_for_submit(self):
+        error_msgs = []
         reference = self.ui.referenceField.text()
         if reference == "":
-            errorMsgs.append("Du har glomt referensfaltet")
-        counter = 1
-        for j in self.jobList:
+            error_msgs.append("You have forgotten the reference field")
 
-            if j.description.text() == "":
-                errorMsgs.append("Du har glomt beskrivning pa job " + str(counter))
-            try:
-                float(j.price.text().replace(",", "."))
-            except Exception:
-                errorMsgs.append(
-                    "Det ser inte ut som en siffra pa priset pa job " + str(counter)
-                )
-            try:
-                int(j.number.text())
-            except Exception:
-                errorMsgs.append(
-                    "Det ser inte ut som en siffra pa antalet pa job " + str(counter)
-                )
-            counter += 1
+        for counter, j in enumerate(self.jobList, 1):
+            error_msgs += self.__validate_job(j, counter)
         if self.newCustomerActivated:
-            if self.newCustomerForm.name.text() == "":
-                errorMsgs.append("Det finns inget namn pa den nya kunden")
-            if self.newCustomerForm.address.text() == "":
-                errorMsgs.append("Det finns ingen address pa den nya kunden")
-            if self.newCustomerForm.zip.text() == "":
-                errorMsgs.append("Det finns inget postnummer pa den nya kunden")
-
-        if len(errorMsgs) != 0:
+            error_msgs += self.__validate_new_customer()
+        if len(error_msgs) != 0:
             errWidget = QErrorMessage(self)
-            errWidget.showMessage("<br/>".join(errorMsgs))
+            errWidget.showMessage("<br/>".join(error_msgs))
             return False
         return True
 
@@ -176,8 +176,8 @@ class FaktureraMeraWindow(QMainWindow):
                 self.add_job_widget()
             job = self.jobList[-1]
             job.description.setText(j.text)
-            job.number.setText(str(j.number))
-            job.price.setText(str(j.price))
+            job.number.setValue(j.number)
+            job.price.setValue(j.price)
 
     def reinitUI(self):
         self.edit_bill_id = 0
@@ -201,7 +201,7 @@ class FaktureraMeraWindow(QMainWindow):
         return customer
 
     def on_saveGenerateButton_clicked(self):
-        if not self.validateForSubmit():
+        if not self.validate_for_submit():
             return
 
         customer = self.__current_customer()
@@ -210,8 +210,8 @@ class FaktureraMeraWindow(QMainWindow):
         jobs = []
         for j in self.jobList:
             text = j.description.text()
-            price = float(j.price.text().replace(",", "."))
-            number = int(j.number.text())
+            price = j.price.value()
+            number = j.number.value()
             jobs.append(Job(price, number, text))
 
         if self.edit_bill_id == 0:

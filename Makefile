@@ -36,7 +36,7 @@ COVERAGE_FLAGS=--branch --source=ui,domain,ext -p -m pytest
 
 test: build/coverage.xml
 
-build/coverage.xml: build integration-test e2etest
+build/coverage.xml: build integration-test e2etest unittest
 	cd src && coverage combine && coverage xml -o ../$@ && coverage report --show-missing && cp .coverage ../
 
 
@@ -45,6 +45,10 @@ integration-test: $(ALL_FILES) build
 
 e2etest: $(ALL_FILES) build
 	cd src && coverage run $(COVERAGE_FLAGS) --junitxml=../build/e2e_test_result.xml ../test/e2e
+
+unittest: $(ALL_FILES) build
+	cd src && coverage run $(COVERAGE_FLAGS) --junitxml=../build/unit_test_result.xml ../test/unit
+
 
 
 # Installer
