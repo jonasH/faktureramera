@@ -4,6 +4,10 @@ When time is given this should be in code instead of in docs
 
 ## Setup docker
 
+
+There are problems with docker and Fedora 31/32 so use podman instead.
+If you're running other os swap podman for docker.
+
 podman volume create jenkins-data
 
 podman build -t jenkins/fm .
