@@ -34,6 +34,14 @@ class Bill:
     def remove_job(self, job):
         self.jobs.remove(job)
 
+    @property
+    def total_sum(self) -> float:
+        total_sum = 0.0
+        for job in self.jobs:
+            total_sum += job.price * job.number
+        return total_sum
+
+
 
 @dataclass(frozen=True)
 class Profile:

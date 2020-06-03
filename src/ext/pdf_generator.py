@@ -5,6 +5,7 @@ from math import ceil
 from domain.model import Bill, Profile
 from typing import List, Generator
 from collections import deque
+from ext.qr import QR, create_qr_image
 
 HEADING_FONT = QFont("Times", 22)
 normalFont = QFont("Times", 12)
@@ -34,6 +35,7 @@ def generate_pdf(bill: Bill, location: str, profile: Profile) -> str:
     __printSpecificationTemplate(painter, profile)
     __printSpecification(painter, bill, profile)
     painter.end()
+    print(file_name)
     return file_name
 
 
@@ -55,16 +57,27 @@ def __print_heading(painter: QPainter) -> None:
     painter.drawText(doc.width() / 2 - 800, doc.height() / 14, "FAKTURA")
 
 
+def bill_date(bill: Bill) -> QDate:
+    y, m, d = bill.bill_date.split("-")
+    date = QDate(int(y), int(m), int(d))
+    return date
+
+
+def due_date(bill: Bill, profile: Profile) -> QDate:
+    date = bill_date(bill)
+    return date.addDays(profile.days_to_pay)
+
+
 def __printInformation(painter: QPainter, bill: Bill, profile: Profile) -> None:
     """Print two columns with information about the bill"""
     doc = painter.device()
     xFirst = doc.width() / 10
     yFirst = doc.height() / 10
     xSecond = doc.width() / 2 + doc.width() / 10
-    y, m, d = bill.bill_date.split("-")
-    date = QDate(int(y), int(m), int(d))
     dateFormat = "yyyy-MM-dd"
-    payDay = date.addDays(profile.days_to_pay)
+
+    date = bill_date(bill)
+    payDay = due_date(bill, profile)
 
     painter.setFont(normalFont)
 
@@ -228,23 +241,40 @@ def __printSpecification(painter: QPainter, bill: Bill, profile: Profile) -> Non
     fourthCol = margin * 8
     painter.setFont(normalFont)
 
-    totalSum = 0.0
     y_line = yFirstLine
     for job in bill.jobs:
         y_line = __print_spec_text(painter, y_line, margin, job.text)
         painter.drawText(secondCol, y_line, str(job.number))
         painter.drawText(thirdCol, y_line, "{:10.2f}".format(job.price))
         painter.drawText(fourthCol, y_line, "{:10.2f}".format(job.price * job.number))
-        totalSum += job.price * job.number
+
         y_line += normalRowDistance
 
-    painter.drawText(
-        fourthCol, yThirdLine + normalRowDistance, "{:10.2f}".format(totalSum)
+    total_sum = bill.total_sum
+    y = yThirdLine + normalRowDistance
+    painter.drawText(fourthCol, y, f"{total_sum:10.2f}")
+    tax = total_sum * profile.tax
+    y += normalRowDistance
+    painter.drawText(fourthCol, y, f"{tax:10.2f}")
+    taxed_sum = total_sum + tax
+    y += normalRowDistance
+    painter.drawText(fourthCol, y, f"{taxed_sum:10.2f}")
+    qr_x = secondCol
+    qr_y = yThirdLine + normalRowDistance
+    __add_summary_qr(painter, profile, taxed_sum, qr_x, qr_y)
+
+
+def __add_summary_qr(painter: QPainter, profile: Profile, bill: Bill, amount:float, x: int, y: int):
+    date_format = "yyyyMMdd"
+    due = due_date(bill, profile)
+    due_date.toString(date_format)
+    qr_data = QR(
+        due_date=due,
+        amount=amount,
+        org_nr=profile.bank_account,
+        reference=bill.reference,
+        account_type=account_type,
+        account_number=account_nr,
+        company_name=profile.company_name,
     )
-    tax = totalSum * profile.tax
-    painter.drawText(
-        fourthCol, yThirdLine + normalRowDistance * 2, "{:10.2f}".format(tax)
-    )
-    painter.drawText(
-        fourthCol, yThirdLine + normalRowDistance * 4, "{:10.2f}".format(totalSum + tax)
-    )
+    painter.drawImage(x, y, create_qr_image(QR()))
