@@ -1,1 +1,1 @@
-cd src && python -m pytest ../$1
+cd src && python -m pytest ../$@
