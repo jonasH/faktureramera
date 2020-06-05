@@ -41,5 +41,7 @@ class AbstractDatabase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def fetch_job(self, job_id: int) -> Job:
+    def search_jobs(self, bill_id: int = 0, limit: int = 0) -> List[Job]:
+        """Order shall be descending with respect to job id
+        """
         pass

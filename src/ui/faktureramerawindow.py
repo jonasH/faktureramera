@@ -3,6 +3,7 @@ from PySide2.QtWidgets import (
     QMainWindow,
     QErrorMessage,
     QPushButton,
+    QCompleter,
 )
 from PySide2.QtSql import QSqlQueryModel
 from PySide2.QtCore import Qt, QFile, QObject, QEvent
@@ -13,6 +14,7 @@ from support import resource_path
 import platform
 from typing import List
 import subprocess
+from functools import partial
 
 
 def load_ui(filename):
@@ -36,10 +38,7 @@ class NewJobFilter(QObject):
     def eventFilter(self, obj, event):
         if event.type() == QEvent.KeyPress and event.key() == Qt.Key_Tab:
             self.parent().add_job_widget()
-            return True
-        else:
-            # standard event processing
-            return QObject.eventFilter(self, obj, event)
+        return QObject.eventFilter(self, obj, event)
 
 
 class FaktureraMeraWindow(QMainWindow):
@@ -50,6 +49,7 @@ class FaktureraMeraWindow(QMainWindow):
         self.edit_bill_id = 0
         self.tab_new_job_filter = NewJobFilter(self)
         self.jobList = []
+        self.__last_jobs = self.app.search_jobs(20)
         self.setup_ui()
         if load_data:
             self.load_data()
@@ -185,6 +185,8 @@ class FaktureraMeraWindow(QMainWindow):
         numberOfJobs = len(self.jobList)
         for i in range(numberOfJobs):
             self.removeJobWidget()
+        self.__last_jobs = self.app.search_jobs(20)
+
         self.add_job_widget()
         self.ui.referenceField.clear()
         self.hideNewCustomer()
@@ -233,10 +235,21 @@ class FaktureraMeraWindow(QMainWindow):
         QApplication.processEvents()
         self.jobList.remove(job)
 
+    def __completion_selected(self, job_text: str, job_widget):
+        job_data = self.__last_jobs[job_text]
+        job_widget.price.setValue(job_data.price)
+        job_widget.price.setFocus()
+
     def add_job_widget(self,):
         if len(self.jobList) > 0:
             self.jobList[-1].number.removeEventFilter(self.tab_new_job_filter)
         job = load_ui("jobform.ui")
+
+        names = list(self.__last_jobs.keys())
+        completer = QCompleter(names)
+        ev_handler = partial(self.__completion_selected, job_widget=job)
+        completer.activated.connect(ev_handler)
+        job.description.setCompleter(completer)
         self.ui.jobsLayout.addWidget(job)
         self.jobList.append(job)
         job.number.installEventFilter(self.tab_new_job_filter)

@@ -48,18 +48,6 @@ def test_fetch_customers(clear_db):
     assert customer != customer2
 
 
-def test_create_bill_and_fetch_bill(clear_db):
-    customer_name = "viktor"
-    customer = clear_db.create_customer(customer_name, "Sätra 123", "123 Gävle")
-    customer_ref = "Jonas Berg"
-    bill = clear_db.create_bill(customer_ref, customer.id, [])
-    assert bill.id == 1
-    assert bill.reference == customer_ref
-    assert len(bill.jobs) == 0
-    bill2 = clear_db.fetch_bill(bill.id)
-    assert bill == bill2
-
-
 def test_delete_bill(clear_db):
     customer_name = "viktor"
     customer = clear_db.create_customer(customer_name, "Sätra 123", "123 Gävle")
@@ -77,13 +65,24 @@ def test_add_job(clear_db):
     customer_ref = "Jonas Berg"
     bill = clear_db.create_bill(customer_ref, customer.id, [])
     bill = clear_db.add_job(300, 4, "worki", bill)
-    job = clear_db.fetch_job(bill.jobs[0].id)
+    job = clear_db.search_jobs(bill.id)[0]
     assert job == bill.jobs[0]
     bill2 = clear_db.fetch_bill(bill.id)
     assert bill == bill2
-    with pytest.raises(RuntimeError) as err_info:
-        clear_db.fetch_job("jioeagrjiogerajoiegraijo")
-    assert "Could not fetch" in str(err_info.value)
+
+
+def test_multiple_bills(clear_db):
+    customer_name = "viktor"
+    customer = clear_db.create_customer(customer_name, "Sätra 123", "123 Gävle")
+    customer_ref = "Jonas Berg"
+    bill = clear_db.create_bill(customer_ref, customer.id, [])
+    bill = clear_db.add_job(300, 4, "worki", bill)
+    bill2 = clear_db.create_bill(customer_ref, customer.id, [])
+    bill2 = clear_db.add_job(300, 4, "worki", bill2)
+    bill = clear_db.fetch_bill(bill.id)
+    bill2 = clear_db.fetch_bill(bill2.id)
+    assert len(bill.jobs) == 1
+    assert bill != bill2
 
 
 def test_update_bill_referece(clear_db):

@@ -33,6 +33,27 @@ class PySide2SqliteDb(AbstractDatabase):
         if init_db:
             _configure_database(database_name)
 
+    def search_jobs(self, bill_id: int = 0, limit: int = 0) -> List[Job]:
+        """Orderes jobs with the highest id first
+        """
+        res = []
+        query = QSqlQuery()
+        q = "select id, hours, price, job from jobs"
+        if bill_id > 0:
+            q += " where b_id=?"
+        q += " order by id desc"
+        if limit > 0:
+            q += " limit ?"
+        query.prepare(q)
+        if bill_id > 0:
+            query.addBindValue(bill_id)
+        if limit > 0:
+            query.addBindValue(limit)
+        query.exec_()
+        while query.next():
+            res.append(_extract_job(query))
+        return res
+
     def clear_all_tables(self):
         query = QSqlQuery()
         query.exec_("delete from bill")
@@ -93,7 +114,7 @@ class PySide2SqliteDb(AbstractDatabase):
         customer_id = query.value(3)
         customer = self.fetch_customer(customer_id)
         bill.customer = customer
-        bill.jobs = self.__fetch_jobs(query)
+        bill.jobs = self.search_jobs(bill_id=bill.id)
 
         return bill
 
@@ -139,31 +160,10 @@ class PySide2SqliteDb(AbstractDatabase):
         query.addBindValue(price)
         query.addBindValue(text)
         query.exec_()
-        job = self.__fetch_job(query, "select max(id) from jobs")
+        job = self.search_jobs(bill_id=bill.id, limit=1)[0]
+
         bill.add_job(job)
         return bill
-
-    def __fetch_jobs(self, bill: Bill) -> List[Job]:
-        res = []
-        query = QSqlQuery()
-        query.prepare("select id, hours, price, job from jobs")
-        query.exec_()
-        while query.next():
-            res.append(_extract_job(query))
-        return res
-
-    def __fetch_job(self, query, id_expr) -> Job:
-        query.prepare(f"select id, hours, price, job from jobs where id=({id_expr})")
-        query.exec_()
-        if not query.next():
-            raise RuntimeError(f"Could not fetch job with id {id_expr}")
-
-        job = _extract_job(query)
-        return job
-
-    def fetch_job(self, job_id: int) -> Job:
-        query = QSqlQuery()
-        return self.__fetch_job(query, job_id)
 
 
 # Helper functions

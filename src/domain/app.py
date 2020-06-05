@@ -1,4 +1,4 @@
-from typing import Generator, List
+from typing import Generator, List, Dict
 from domain.model import Customer, Bill, Job, Profile
 import os
 from interface.settings_if import AbstractSettings
@@ -12,6 +12,11 @@ class FM(object):
         self.__generate_bill = generate_bill
         self.db = db
         self.settings = settings
+
+    def search_jobs(self, limit) -> Dict[str, Job]:
+        jobs = self.db.search_jobs(limit=limit)
+        res = {j.text: j for j in jobs}
+        return res
 
     @property
     def bills_location(self) -> str:
@@ -49,9 +54,6 @@ class FM(object):
 
     def add_job(self, price: float, number: int, text: str, bill: Bill) -> Bill:
         return self.db.add_job(price, number, text, bill)
-
-    def fetch_job(self, job_id: int) -> Job:
-        return self.db.fetch_job(job_id)
 
     def __enter__(self):
         return self
