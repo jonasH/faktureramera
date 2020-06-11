@@ -7,10 +7,12 @@ from ui.faktureramerawindow import FaktureraMeraWindow
 import sys
 from support import settings_folder
 import os
+from PySide2.QtCore import QTranslator
 
 
 def main():
     app = QApplication(sys.argv)
+    translator = QTranslator()
     user_settings_folder = settings_folder()
     if not os.path.exists(user_settings_folder):
         os.mkdir(user_settings_folder)
@@ -18,8 +20,8 @@ def main():
     db = PySide2SqliteDb(db_path)
     settings = ConfigParserSettings(user_settings_folder)
     with FM(db, generate_pdf, settings) as fm:
-        faktureramera = FaktureraMeraWindow(fm)
-        faktureramera.ui.show()
+        faktureramera = FaktureraMeraWindow(fm, translator)
+        faktureramera.show()
         exit_val = app.exec_()
     sys.exit(exit_val)
 

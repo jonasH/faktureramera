@@ -3,6 +3,8 @@ ALL_FOLDERS=src test/integration_tests test/e2e
 ALL_FILES=$(shell find $(ALL_FOLDERS) -name ".*" -prune -o -name "*.py" -print)
 .PHONY: test check mypy flake8 format clean exe integration-test
 
+default: src/ui/faktureramera.py src/ui/i18n/en_US.qm src/ui/i18n/se_SE.qm
+
 
 # Generic project
 build:
@@ -49,7 +51,28 @@ e2etest: $(ALL_FILES) build
 unittest: $(ALL_FILES) build
 	cd src && coverage run $(COVERAGE_FLAGS) --junitxml=../build/unit_test_result.xml ../test/unit
 
+# qt
 
+src/ui/faktureramera.py: src/ui/faktureramera.ui
+	pyside2-uic $< > $@ && sed -i 's/\(.*QCoreApplication.translate("MainWindow", \)u\([^,]*\), None\(.*\)/\1\2\3/g' $@
+
+
+
+src/ui/i18n: src/ui/i18n/en_US.qm src/ui/i18n/se_SE.qm
+
+src/ui/i18n/en_US.qm: src/ui/i18n/en_US.ts
+	lrelease-qt5 $<
+
+src/ui/i18n/se_SE.qm: src/ui/i18n/se_SE.ts
+	lrelease-qt5 $<
+
+GUI_FILES=src/ui/faktureramera.py src/ui/faktureramerawindow.py src/ui/jobform.ui src/ui/newcustomerform.ui
+
+src/ui/i18n/en_US.ts: $(GUI_FILES)
+	pyside2-lupdate $^ -ts $@
+
+src/ui/i18n/se_SE.ts: $(GUI_FILES)
+	pyside2-lupdate $^ -ts $@
 
 # Installer
 exe: clean

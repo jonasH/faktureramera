@@ -1,6 +1,7 @@
 *pdf
+.coverage
 __pycache__
-.*
+.mypy_cache
 *~
 *.autosave
 *#*

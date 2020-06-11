@@ -1,6 +1,6 @@
 from PySide2.QtWidgets import QApplication
 from ext.pyside2_sqlite_db import PySide2SqliteDb
-
+from PySide2.QtCore import QTranslator
 from domain.app import FM
 from ui.faktureramerawindow import FaktureraMeraWindow
 import os
@@ -12,7 +12,7 @@ import shutil
 
 
 def __create_first_customer_and_bill(faktureramera, open_file, exp_report_path):
-    faktureramera.on_newCustomerButton_clicked()
+    faktureramera.on_new_customer_button_clicked()
     faktureramera.newCustomerForm.name.setText("asfd")
     faktureramera.newCustomerForm.address.setText("300")
     faktureramera.newCustomerForm.zip.setText("40")
@@ -32,7 +32,7 @@ def __create_first_customer_and_bill(faktureramera, open_file, exp_report_path):
     assert len(faktureramera.jobList) == 1
     faktureramera.on_removeJobButton_clicked()
     assert len(faktureramera.jobList) == 1
-    faktureramera.on_saveGenerateButton_clicked()
+    faktureramera.on_generate_button_clicked()
     open_file.assert_called_once_with(exp_report_path)
     open_file.reset_mock()
 
@@ -54,7 +54,7 @@ def __change_bill(faktureramera, open_file, exp_report_path):
     job_form.description.setText("aqqqsfd")
     job_form.price.setValue(305)
     job_form.number.setValue(42)
-    faktureramera.on_saveGenerateButton_clicked()
+    faktureramera.on_update_button_clicked()
     open_file.assert_called_once_with(exp_report_path)
     open_file.reset_mock()
 
@@ -89,7 +89,7 @@ def test_bills(open_file, user_settings_folder):
     settings = ConfigParserSettings(user_settings_folder)
     # intentionally not using with-statement to not save settings
     fm = FM(db, generate_pdf, settings)
-    faktureramera = FaktureraMeraWindow(fm)
+    faktureramera = FaktureraMeraWindow(fm, QTranslator())
     __create_first_customer_and_bill(faktureramera, open_file, exp_report_path)
     __regenerate_bill(faktureramera, open_file, exp_report_path)
     __change_bill(faktureramera, open_file, exp_report_path)
@@ -132,7 +132,7 @@ def test_user_settings(user_settings_folder):
     assert old_profile.company_name != exp_name
 
     with FM(db, generate_pdf, settings) as fm:
-        faktureramera = FaktureraMeraWindow(fm)
+        faktureramera = FaktureraMeraWindow(fm, QTranslator())
         __confirm_old_settings_in_gui(faktureramera, old_profile)
         faktureramera.ui.due_date_input.setValue(exp_due_date)
         faktureramera.ui.address_input.setText(exp_address)

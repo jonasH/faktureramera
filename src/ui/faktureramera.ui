@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>819</width>
     <height>660</height>
    </rect>
   </property>
@@ -22,7 +22,7 @@
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
-        <string>Fakturera</string>
+        <string>Billing</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
@@ -30,17 +30,20 @@
           <property name="minimumSize">
            <size>
             <width>200</width>
-            <height>200</height>
+            <height>250</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>200</height>
+            <height>250</height>
            </size>
           </property>
           <property name="title">
-           <string>Kund</string>
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
@@ -54,7 +57,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>Kund:</string>
+                <string>Customer:</string>
                </property>
               </widget>
              </item>
@@ -68,31 +71,75 @@
                </property>
               </widget>
              </item>
-             <item alignment="Qt::AlignRight">
-              <widget class="QPushButton" name="newCustomerButton">
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>Ny</string>
-               </property>
-              </widget>
-             </item>
              <item>
-              <spacer name="verticalSpacer">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
+              <widget class="QGroupBox" name="groupBox_5">
+               <property name="title">
+                <string/>
                </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
+               <widget class="QWidget" name="horizontalLayoutWidget">
+                <property name="geometry">
+                 <rect>
+                  <x>10</x>
+                  <y>10</y>
+                  <width>351</width>
+                  <height>25</height>
+                 </rect>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_6">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <spacer name="horizontalSpacer_4">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeType">
+                    <enum>QSizePolicy::Maximum</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>118</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="cancel_customer_button">
+                   <property name="maximumSize">
+                    <size>
+                     <width>100</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="layoutDirection">
+                    <enum>Qt::RightToLeft</enum>
+                   </property>
+                   <property name="text">
+                    <string>Cancel</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="new_customer_button">
+                   <property name="maximumSize">
+                    <size>
+                     <width>100</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="layoutDirection">
+                    <enum>Qt::RightToLeft</enum>
+                   </property>
+                   <property name="text">
+                    <string>New</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
              </item>
              <item>
               <widget class="QGroupBox" name="groupBox_2">
@@ -103,7 +150,7 @@
                 <item>
                  <widget class="QLabel" name="label_2">
                   <property name="text">
-                   <string>Referens:</string>
+                   <string>Reference:</string>
                   </property>
                  </widget>
                 </item>
@@ -138,7 +185,7 @@
         <item>
          <widget class="QGroupBox" name="jobsGroup">
           <property name="title">
-           <string>Jobb</string>
+           <string>Specification</string>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
@@ -151,8 +198,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>734</width>
-                <height>232</height>
+                <width>753</width>
+                <height>182</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -181,21 +228,21 @@
            <item>
             <widget class="QPushButton" name="addJobButton">
              <property name="text">
-              <string>Nytt jobb</string>
+              <string>Add Item</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="removeJobButton">
              <property name="text">
-              <string>Ta bort jobb</string>
+              <string>Remove Item</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="zeroButton">
              <property name="text">
-              <string>Nollställ</string>
+              <string>Clear Items</string>
              </property>
             </widget>
            </item>
@@ -213,9 +260,16 @@
             </spacer>
            </item>
            <item>
-            <widget class="QPushButton" name="saveGenerateButton">
+            <widget class="QPushButton" name="update_button">
              <property name="text">
-              <string>Generera</string>
+              <string>Update</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="generate_button">
+             <property name="text">
+              <string>Generate</string>
              </property>
             </widget>
            </item>
@@ -226,7 +280,7 @@
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
-        <string>Historik</string>
+        <string>History</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
@@ -245,14 +299,14 @@
            <item>
             <widget class="QPushButton" name="maculateButton">
              <property name="text">
-              <string>Makulera</string>
+              <string>Maculate</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="editBillButton">
              <property name="text">
-              <string>Ändra i faktura</string>
+              <string>Edit</string>
              </property>
             </widget>
            </item>
@@ -272,7 +326,7 @@
            <item>
             <widget class="QPushButton" name="generateButton">
              <property name="text">
-              <string>Generera</string>
+              <string>Re-generate</string>
              </property>
             </widget>
            </item>
@@ -285,120 +339,169 @@
        <attribute name="title">
         <string>Settings</string>
        </attribute>
-       <widget class="QGroupBox" name="groupBox_4">
+       <widget class="QGroupBox" name="groupBox_6">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>371</width>
-          <height>361</height>
+          <x>-1</x>
+          <y>9</y>
+          <width>791</width>
+          <height>551</height>
          </rect>
         </property>
         <property name="title">
-         <string>Profile</string>
+         <string>GroupBox</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout">
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>Mail</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_7">
-           <property name="text">
-            <string>Org. Nr</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0">
-          <widget class="QLabel" name="label_9">
-           <property name="text">
-            <string>Tax [%]</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Days to due</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="1">
-          <widget class="QLineEdit" name="company_name_input"/>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Address</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QLineEdit" name="mail_input"/>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>Telephone</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="address_input"/>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="label_8">
-           <property name="text">
-            <string>Bank Account</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QLineEdit" name="bank_no_input"/>
-         </item>
-         <item row="0" column="1">
-          <widget class="QSpinBox" name="due_date_input"/>
-         </item>
-         <item row="4" column="1">
-          <widget class="QLineEdit" name="org_nr_input"/>
-         </item>
-         <item row="7" column="0">
-          <widget class="QLabel" name="label_10">
-           <property name="text">
-            <string>Company Name</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="1">
-          <widget class="QSpinBox" name="tax_input"/>
-         </item>
-         <item row="3" column="1">
-          <widget class="QLineEdit" name="telephone_input"/>
-         </item>
-         <item row="8" column="1">
-          <widget class="QPushButton" name="save_profile_btn">
-           <property name="text">
-            <string>Save</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QPushButton" name="open_bills_btn">
-        <property name="geometry">
-         <rect>
-          <x>469</x>
-          <y>50</y>
-          <width>181</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Open Bills Location</string>
-        </property>
+        <widget class="QWidget" name="widget" native="true">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>50</y>
+           <width>371</width>
+           <height>491</height>
+          </rect>
+         </property>
+         <widget class="QWidget" name="gridLayoutWidget">
+          <property name="geometry">
+           <rect>
+            <x>40</x>
+            <y>0</y>
+            <width>301</width>
+            <height>91</height>
+           </rect>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_11">
+             <property name="text">
+              <string>Language</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QPushButton" name="open_bills_btn">
+             <property name="text">
+              <string>Open Bills Location</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="language_chooser"/>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="widget_2" native="true">
+         <property name="geometry">
+          <rect>
+           <x>390</x>
+           <y>0</y>
+           <width>391</width>
+           <height>559</height>
+          </rect>
+         </property>
+         <widget class="QGroupBox" name="groupBox_4">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>391</width>
+            <height>371</height>
+           </rect>
+          </property>
+          <property name="title">
+           <string>Profile</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>Org. Nr</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QSpinBox" name="tax_input"/>
+           </item>
+           <item row="7" column="0">
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>Company Name</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="telephone_input"/>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>Telephone</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="mail_input"/>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>Tax [%]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="address_input"/>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_8">
+             <property name="text">
+              <string>Bank Account</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
+            <widget class="QLineEdit" name="company_name_input"/>
+           </item>
+           <item row="5" column="1">
+            <widget class="QLineEdit" name="bank_no_input"/>
+           </item>
+           <item row="0" column="1">
+            <widget class="QSpinBox" name="due_date_input"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_4">
+             <property name="text">
+              <string>Address</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>Days to due</string>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="1">
+            <widget class="QPushButton" name="save_profile_btn">
+             <property name="text">
+              <string>Save</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_5">
+             <property name="text">
+              <string>Mail</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QLineEdit" name="org_nr_input"/>
+           </item>
+          </layout>
+         </widget>
+        </widget>
        </widget>
       </widget>
      </widget>
@@ -410,7 +513,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>819</width>
      <height>20</height>
     </rect>
    </property>

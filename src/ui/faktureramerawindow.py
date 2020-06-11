@@ -6,7 +6,14 @@ from PySide2.QtWidgets import (
     QCompleter,
 )
 from PySide2.QtSql import QSqlQueryModel
-from PySide2.QtCore import Qt, QFile, QObject, QEvent
+from PySide2.QtCore import (
+    Qt,
+    QFile,
+    QObject,
+    QEvent,
+    QSettings,
+    QCoreApplication,
+)
 from PySide2.QtUiTools import QUiLoader
 import os
 from domain.model import Job, Profile
@@ -15,6 +22,7 @@ import platform
 from typing import List
 import subprocess
 from functools import partial
+from ui.faktureramera import Ui_MainWindow
 
 
 def load_ui(filename):
@@ -24,6 +32,7 @@ def load_ui(filename):
     qfile = QFile(file_name)
     qfile.open(QFile.ReadOnly)
     loader = QUiLoader()
+    loader.setLanguageChangeEnabled(True)
     return loader.load(qfile)
 
 
@@ -42,22 +51,47 @@ class NewJobFilter(QObject):
 
 
 class FaktureraMeraWindow(QMainWindow):
-    def __init__(self, app, parent=None, load_data=True):
-        """"""
+    def __init__(self, app, translator, parent=None, load_data=True):
         super(FaktureraMeraWindow, self).__init__(parent)
+        self.translator = translator
         self.app = app
         self.edit_bill_id = 0
         self.tab_new_job_filter = NewJobFilter(self)
         self.jobList = []
         self.__last_jobs = self.app.search_jobs(20)
         self.setup_ui()
+        self.load_settings()
         if load_data:
             self.load_data()
+
+    def load_settings(self):
+        settings = QSettings("JH Code Factory", "FaktureraMera")
+        tab_index = int(settings.value("MainWindow/tab", 0))
+        self.ui.tabWidget.setCurrentIndex(tab_index)
+        current_lang = settings.value("Application/lang", "se_SE")
+        self.ui.language_chooser.setCurrentText(current_lang)
+        self.install_language(current_lang)
+
+    def install_language(self, lang):
+        QApplication.removeTranslator(self.translator)
+        path = f"src/ui/i18n/{lang}"
+        self.translator.load(path)
+        QApplication.installTranslator(self.translator)
+
+    def save_settings(self):
+        settings = QSettings("JH Code Factory", "FaktureraMera")
+        settings.setValue("MainWindow/tab", self.ui.tabWidget.currentIndex())
+        settings.setValue("Application/lang", self.ui.language_chooser.currentText())
+
+    def closeEvent(self, event):
+        self.save_settings()
+        event.accept()
 
     def load_data(self):
         self.updateHistoryTable()
         self.populateCustomers()
         self.load_settings_data()
+        self.load_settings()
 
     def load_settings_data(self):
         profile = self.app.profile()
@@ -70,30 +104,45 @@ class FaktureraMeraWindow(QMainWindow):
         self.ui.tax_input.setValue(profile.tax * 100)
         self.ui.company_name_input.setText(profile.company_name)
 
+    def on_language_changed(self, index):
+        lang = self.ui.language_chooser.currentText()
+        self.install_language(lang)
+        self.ui.retranslateUi(self)
+
     def setup_ui(self) -> None:
-        self.ui = load_ui("faktureramera.ui")
-        btn = self.ui.findChild(QPushButton, "newCustomerButton")
-        btn.clicked.connect(self.on_newCustomerButton_clicked)
-        btn = self.ui.findChild(QPushButton, "saveGenerateButton")
-        btn.clicked.connect(self.on_saveGenerateButton_clicked)
-        btn = self.ui.findChild(QPushButton, "zeroButton")
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+        lang = self.ui.language_chooser
+        lang.addItems(["en_US", "se_SE"])
+        lang.currentIndexChanged.connect(self.on_language_changed)
+        btn = self.findChild(QPushButton, "new_customer_button")
+        btn.clicked.connect(self.on_new_customer_button_clicked)
+        btn = self.findChild(QPushButton, "cancel_customer_button")
+        btn.clicked.connect(self.on_cancel_customer_button_clicked)
+        btn = self.findChild(QPushButton, "generate_button")
+        btn.clicked.connect(self.on_generate_button_clicked)
+        btn = self.findChild(QPushButton, "update_button")
+        btn.clicked.connect(self.on_update_button_clicked)
+        btn = self.findChild(QPushButton, "zeroButton")
         btn.clicked.connect(self.on_zeroButton_clicked)
-        btn = self.ui.findChild(QPushButton, "editBillButton")
+        btn = self.findChild(QPushButton, "editBillButton")
         btn.clicked.connect(self.on_editBillButton_clicked)
-        btn = self.ui.findChild(QPushButton, "addJobButton")
+        btn = self.findChild(QPushButton, "addJobButton")
         btn.clicked.connect(self.on_addJobButton_clicked)
-        btn = self.ui.findChild(QPushButton, "removeJobButton")
+        btn = self.findChild(QPushButton, "removeJobButton")
         btn.clicked.connect(self.on_removeJobButton_clicked)
-        btn = self.ui.findChild(QPushButton, "maculateButton")
+        btn = self.findChild(QPushButton, "maculateButton")
         btn.clicked.connect(self.on_maculateButton_clicked)
-        btn = self.ui.findChild(QPushButton, "generateButton")
+        btn = self.findChild(QPushButton, "generateButton")
         btn.clicked.connect(self.on_generateButton_clicked)
-        btn = self.ui.findChild(QPushButton, "open_bills_btn")
+        btn = self.findChild(QPushButton, "open_bills_btn")
         btn.clicked.connect(self.on_open_bills)
-        btn = self.ui.findChild(QPushButton, "save_profile_btn")
+        btn = self.findChild(QPushButton, "save_profile_btn")
         btn.clicked.connect(self.on_save_profile)
+        self.ui.generate_button.show()
+        self.ui.update_button.hide()
         self.newCustomerForm = load_ui("newcustomerform.ui")
-        self.newCustomerForm.hide()
+        self.hideNewCustomer()
         self.ui.newCustomerLayout.addWidget(self.newCustomerForm)
         self.add_job_widget()
 
@@ -120,28 +169,50 @@ class FaktureraMeraWindow(QMainWindow):
     def __validate_job(self, j, counter: int) -> List[str]:
         error_msgs = []
         if j.description.text() == "":
-            error_msgs.append(f"Description is empty for job {counter}")
+            err_msg = QCoreApplication.translate(
+                "main", "Description is empty for job {counter}"
+            )
+            err_msg.format(counter=counter)
+            error_msgs.append(err_msg)
         if j.price.value() == 0.0:
-            error_msgs.append(f"Price is zero for job {counter}")
+            err_msg = QCoreApplication.translate(
+                "main", "Price is zero for job {counter}"
+            )
+            err_msg.format(counter=counter)
+            error_msgs.append(err_msg)
         if j.number.value() == 0:
-            error_msgs.append(f"Number is zero for job {counter}")
+            err_msg = QCoreApplication.translate(
+                "main", "Number is zero for job {counter}"
+            )
+            err_msg.format(counter=counter)
+            error_msgs.append(err_msg)
         return error_msgs
 
     def __validate_new_customer(self) -> List[str]:
         err_msgs = []
         if self.newCustomerForm.name.text() == "":
-            err_msgs.append("Det finns inget namn pa den nya kunden")
+            err_msgs.append(
+                QCoreApplication.translate("main", "No name for the new customer")
+            )
         if self.newCustomerForm.address.text() == "":
-            err_msgs.append("Det finns ingen address pa den nya kunden")
+            err_msgs.append(
+                QCoreApplication.translate("main", "No address for the new customer")
+            )
         if self.newCustomerForm.zip.text() == "":
-            err_msgs.append("Det finns inget postnummer pa den nya kunden")
+            err_msgs.append(
+                QCoreApplication.translate("main", "No zip code for the new customer")
+            )
         return err_msgs
 
     def validate_for_submit(self):
         error_msgs = []
         reference = self.ui.referenceField.text()
         if reference == "":
-            error_msgs.append("You have forgotten the reference field")
+            error_msgs.append(
+                QCoreApplication.translate(
+                    "main", "You have forgotten the reference field"
+                )
+            )
 
         for counter, j in enumerate(self.jobList, 1):
             error_msgs += self.__validate_job(j, counter)
@@ -165,10 +236,10 @@ class FaktureraMeraWindow(QMainWindow):
         bill = self.app.fetch_bill(billId)
         self.poulateBillData(bill)
         self.edit_bill_id = billId
-        self.ui.saveGenerateButton.setText("Uppdatera")
+        self.ui.generate_button.hide()
+        self.ui.update_button.show()
 
     def poulateBillData(self, bill):
-        """"""
         self.ui.customerChooser.setCurrentIndex(bill.customer.id - 1)
         self.ui.referenceField.setText(bill.reference)
         for j in bill.jobs:
@@ -181,7 +252,9 @@ class FaktureraMeraWindow(QMainWindow):
 
     def reinitUI(self):
         self.edit_bill_id = 0
-        self.ui.saveGenerateButton.setText("Generera")
+        self.ui.generate_button.show()
+        self.ui.update_button.hide()
+
         numberOfJobs = len(self.jobList)
         for i in range(numberOfJobs):
             self.removeJobWidget()
@@ -202,7 +275,13 @@ class FaktureraMeraWindow(QMainWindow):
             customer = self.app.fetch_customer(customer_id)
         return customer
 
-    def on_saveGenerateButton_clicked(self):
+    def on_update_button_clicked(self):
+        self.save_and_generate_bill()
+
+    def on_generate_button_clicked(self):
+        self.save_and_generate_bill()
+
+    def save_and_generate_bill(self):
         if not self.validate_for_submit():
             return
 
@@ -244,7 +323,6 @@ class FaktureraMeraWindow(QMainWindow):
         if len(self.jobList) > 0:
             self.jobList[-1].number.removeEventFilter(self.tab_new_job_filter)
         job = load_ui("jobform.ui")
-
         names = list(self.__last_jobs.keys())
         completer = QCompleter(names)
         ev_handler = partial(self.__completion_selected, job_widget=job)
@@ -264,7 +342,6 @@ class FaktureraMeraWindow(QMainWindow):
         self.removeJobWidget()
 
     def on_maculateButton_clicked(self):
-        """"""
         billId = self.__getBillidFromHistory()
         if billId == -1:
             return
@@ -295,33 +372,48 @@ class FaktureraMeraWindow(QMainWindow):
         return not self.ui.customerChooser.isEnabled()
 
     def showNewCustomer(self):
-        if not self.newCustomerActivated:
-            self.ui.customerChooser.setEnabled(False)
-            self.newCustomerForm.show()
-            self.ui.newCustomerButton.setText("Angra")
+        self.ui.customerChooser.setEnabled(False)
+        self.newCustomerForm.show()
+        self.ui.cancel_customer_button.show()
+        self.ui.new_customer_button.hide()
 
     def hideNewCustomer(self):
-        if self.newCustomerActivated:
-            self.ui.customerChooser.setEnabled(True)
-            self.newCustomerForm.hide()
-            self.ui.newCustomerButton.setText("Ny")
+        self.ui.customerChooser.setEnabled(True)
+        self.newCustomerForm.hide()
+        self.ui.cancel_customer_button.hide()
+        self.ui.new_customer_button.show()
 
-    def on_newCustomerButton_clicked(self):
-        if self.newCustomerActivated:
-            self.hideNewCustomer()
-        else:
-            self.showNewCustomer()
+    def on_new_customer_button_clicked(self):
+        self.showNewCustomer()
+
+    def on_cancel_customer_button_clicked(self):
+        self.hideNewCustomer()
 
     def updateHistoryTable(self):
-        """"""
         historyModel = QSqlQueryModel()
-        self.initializeHistoryModel(historyModel)
         self.ui.tableView.setModel(historyModel)
+        self.initializeHistoryModel(historyModel)
+
+    def changeEvent(self, event):
+        if event.type() == QEvent.LanguageChange:
+            self.retranslateUI()
+
+    def retranslateUI(self):
+        model = self.ui.tableView.model()
+        model.setHeaderData(0, Qt.Horizontal, QCoreApplication.translate("main", "ID"))
+        model.setHeaderData(
+            1, Qt.Horizontal, QCoreApplication.translate("main", "Name")
+        )
+        model.setHeaderData(
+            2, Qt.Horizontal, QCoreApplication.translate("main", "Created")
+        )
+        model.setHeaderData(
+            3, Qt.Horizontal, QCoreApplication.translate("main", "Payed")
+        )
+        model.setHeaderData(
+            4, Qt.Horizontal, QCoreApplication.translate("main", "Payed Date")
+        )
 
     def initializeHistoryModel(self, model):
         model.setQuery("select id,reference,bill_date,payed,payed_date from bill")
-        model.setHeaderData(0, Qt.Horizontal, "ID")
-        model.setHeaderData(1, Qt.Horizontal, "Namn")
-        model.setHeaderData(2, Qt.Horizontal, "Fakturan skapad")
-        model.setHeaderData(3, Qt.Horizontal, "Betald")
-        model.setHeaderData(4, Qt.Horizontal, "Betald Datum")
+        self.retranslateUI()

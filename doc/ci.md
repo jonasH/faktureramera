@@ -1,5 +1,8 @@
 # CI description
 
+(venv) [jonas@mobilaxen internationalization]$ podman run -it -v $PWD/build:/build:z -v $PWD/src:/src:z jonaspythontester sh /src/build.sh
+
+
 When time is given this should be in code instead of in docs
 
 ## Setup docker
