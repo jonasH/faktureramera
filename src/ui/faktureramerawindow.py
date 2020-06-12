@@ -74,7 +74,8 @@ class FaktureraMeraWindow(QMainWindow):
 
     def install_language(self, lang):
         QApplication.removeTranslator(self.translator)
-        path = f"src/ui/i18n/{lang}"
+        module_dir = os.path.dirname(__file__)
+        path = resource_path(f"{module_dir}/i18n/{lang}")
         self.translator.load(path)
         QApplication.installTranslator(self.translator)
 

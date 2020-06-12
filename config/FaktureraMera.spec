@@ -4,14 +4,15 @@ block_cipher = None
 
 
 a = Analysis(
-    ["src/pyside2_app.py"],
+    ["../src/pyside2_app.py"],
     pathex=["/home/jonas/Kod/faktureramera"],
     binaries=[],
     datas=[
-        ("src/ui/faktureramera.ui", "ui"),
-        ("src/ui/jobform.ui", "ui"),
-        ("src/ui/newcustomerform.ui", "ui"),
-        ("src/ext/fm.sql", "ext"),
+        ("../src/ui/faktureramera.ui", "ui"),
+        ("../src/ui/i18n/*.qm", "ui/i18n"),
+        ("../src/ui/jobform.ui", "ui"),
+        ("../src/ui/newcustomerform.ui", "ui"),
+        ("../src/ext/fm.sql", "ext"),
     ],
     hiddenimports=["PySide2.QtXml"],
     hookspath=[],
